@@ -1,0 +1,22 @@
+{
+  "name": "kuhhandel",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@preact/signals": "^2.11.3",
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.4.6",
+    "@preact/preset-vite": "^2.10.6",
+    "sharp": "^0.35.5",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.5",
+    "vitest": "~4.1.12",
+    "wrangler": "^4.151.3"
+  }
+}

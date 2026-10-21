@@ -1,0 +1,15 @@
+// The engine is typechecked with no platform types, which keeps it free of I/O
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2023"],
+    "types": [],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true
+  },
+  "include": ["src/rules", "src/protocol.ts", "test/rules", "test/protocol.test.ts"]
+}
