@@ -49,12 +49,12 @@ export function createRoom(a: Extract<Action, { type: "create" }>, tx: Tx): Room
 
 export function joinRoom(room: Room, a: Extract<Action, { type: "join" }>, tx: Tx): void {
   if (room.blockedTokens.includes(a.token)) throw new RuleError("blocked");
+  if (room.players.some((p) => p.token === a.token)) throw new RuleError("alreadySeated");
   const name = normalizeName(a.playerName, 16);
   if (name === null) throw new RuleError("badName");
   if (!isSeat(a.seat)) throw new RuleError("badSeat");
   const lower = name.toLowerCase();
   if (room.players.some((p) => p.name.toLowerCase() === lower)) throw new RuleError("nameTaken");
-  if (room.players.some((p) => p.token === a.token)) throw new RuleError("alreadySeated");
   if (room.players.some((p) => p.seat === a.seat)) throw new RuleError("seatTaken");
   room.players.push(newPlayer(tx, room.players, a.token, name, a.seat));
   room.nobodySince = null;

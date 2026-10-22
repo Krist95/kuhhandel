@@ -16,7 +16,10 @@ describe("lobby", () => {
   });
   it("rejects duplicate names after trimming, case-insensitively", () => {
     expect(fail(lobby(["Anna", "Ben"]), joinAction("  anna ", 3))).toBe("nameTaken");
-    expect(fail(lobby(["Anna", "Ben"]), joinAction("BEN", 3))).toBe("nameTaken");
+    expect(fail(lobby(["Anna", "Ben"]), { ...joinAction("BEN", 3), token: "tok-ben-2" })).toBe("nameTaken");
+  });
+  it("rejects a token that already has a seat", () => {
+    expect(fail(lobby(["Anna", "Ben"]), joinAction("Ben", 3))).toBe("alreadySeated");
   });
   it("enforces 1–16 character names counted in code points", () => {
     for (const bad of ["", "   ", "x".repeat(17)]) expect(fail(lobby(["Anna"]), joinAction(bad, 2))).toBe("badName");
