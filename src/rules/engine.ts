@@ -1,5 +1,6 @@
 import { ERROR_TEXT, RuleError } from "./errors";
 import { bid, decide, pass } from "./auction";
+import { offer, respond } from "./cowTrade";
 import { pay } from "./payment";
 import { startGame } from "./setup";
 import { chooseAction } from "./turn";
@@ -87,9 +88,13 @@ function apply(room: Room | null, action: Action, tx: Tx): Room | null {
           pay(room, p, i.cardIds, tx);
           return room;
         case "cowTradeOffer":
+          needPlaying(room);
+          offer(room, p, i, tx);
+          return room;
         case "cowTradeResponse":
           needPlaying(room);
-          throw new RuleError("invalid");
+          respond(room, p, i.cardIds, tx);
+          return room;
         default:
           throw new RuleError("invalid");
       }
