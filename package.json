@@ -5,8 +5,10 @@
   "scripts": {
     "test": "vitest run",
     "dev:server": "node -e \"require('fs').mkdirSync('web/dist',{recursive:true})\" && wrangler dev",
+    "dev:web": "vite",
+    "build": "vite build",
     "test:server": "node -e \"require('fs').mkdirSync('web/dist',{recursive:true})\" && vitest run --config vitest.server.config.ts",
-    "typecheck": "wrangler types && tsc -p tsconfig.json && tsc -p tsconfig.worker.json"
+    "typecheck": "wrangler types && tsc -p tsconfig.json && tsc -p tsconfig.worker.json && tsc -p web/tsconfig.json"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",
