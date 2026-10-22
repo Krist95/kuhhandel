@@ -1,4 +1,6 @@
 import { ERROR_TEXT, RuleError } from "./errors";
+import { startGame } from "./setup";
+import { chooseAction } from "./turn";
 import { closeRoom, createRoom, joinRoom, leaveSeat, removePlayer, requireHost, setConnected, updateSettings } from "./lobby";
 import { LOG_LIMIT, type Action, type Ctx, type Outcome, type Player, type Room, type RoomEvent, type Seat } from "./types";
 
@@ -51,6 +53,29 @@ function apply(room: Room | null, action: Action, tx: Tx): Room | null {
         case "closeRoom":
           requireHost(room, p);
           return closeRoom(tx);
+        case "startGame":
+          needLobby(room);
+          requireHost(room, p);
+          if (room.players.length < 3 || room.players.length > 5) throw new RuleError("notEnoughPlayers");
+          startGame(room, tx);
+          return room;
+        case "playAgain":
+          if (room.status !== "FINISHED") throw new RuleError("invalid");
+          requireHost(room, p);
+          startGame(room, tx);
+          return room;
+        case "chooseAction":
+          needPlaying(room);
+          chooseAction(room, p, i.action, tx);
+          return room;
+        case "bid":
+        case "pass":
+        case "auctioneerDecision":
+        case "pay":
+        case "cowTradeOffer":
+        case "cowTradeResponse":
+          needPlaying(room);
+          throw new RuleError("invalid");
         default:
           throw new RuleError("invalid");
       }
@@ -60,6 +85,11 @@ function apply(room: Room | null, action: Action, tx: Tx): Room | null {
 
 function needLobby(room: Room): void {
   if (room.status !== "LOBBY") throw new RuleError("invalid");
+}
+
+function needPlaying(room: Room): void {
+  if (room.status === "PAUSED") throw new RuleError("paused");
+  if (room.status !== "PLAYING") throw new RuleError("invalid");
 }
 
 export function addLog(room: Room, text: string): void {

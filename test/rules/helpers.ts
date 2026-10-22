@@ -1,7 +1,9 @@
-import { reduce } from "../../src/rules/engine";
+import { reduce, type Tx } from "../../src/rules/engine";
+import { herdOf } from "../../src/rules/herd";
+import { beginTurn } from "../../src/rules/turn";
 import type { ErrorCode } from "../../src/rules/errors";
 import { mulberry32 } from "../../src/rules/rng";
-import type { Action, Intent, Outcome, Player, Room } from "../../src/rules/types";
+import type { Action, Animal, Herd, Intent, MoneyValue, Outcome, Player, Room, Settings } from "../../src/rules/types";
 
 export const T0 = 1_000_000;
 export const NAMES = ["Anna", "Ben", "Clara"];
@@ -33,4 +35,51 @@ export function pl(room: Room, name: string): Player {
   const p = room.players.find((x) => x.name === name);
   if (!p) throw new Error(`no player ${name}`);
   return p;
+}
+
+export interface GameOpts {
+  deck?: Animal[]; first?: string; money?: Record<string, MoneyValue[]>;
+  herds?: Record<string, Partial<Herd>>; settings?: Partial<Settings>;
+}
+export function withTx(room: Room, fn: (draft: Room, tx: Tx) => void, now = T0): Room {
+  const draft: Room = JSON.parse(JSON.stringify(room));
+  fn(draft, { now, rng: mulberry32(1), events: [] });
+  return draft;
+}
+export function game(names = NAMES, o: GameOpts = {}): Room {
+  let r = lobby(names);
+  if (o.settings) r = run(r, by(names[0], { type: "updateSettings", ...o.settings }))!;
+  return withTx(run(r, by(names[0], { type: "startGame" }))!, (d, tx) => {
+    if (o.deck) d.game!.deck = [...o.deck];
+    for (const [name, values] of Object.entries(o.money ?? {})) pl(d, name).money = values.map((value, i) => ({ id: `${name}-${i + 1}`, value }));
+    for (const [name, h] of Object.entries(o.herds ?? {})) pl(d, name).herd = herdOf(h);
+    beginTurn(d, idOf(d, o.first ?? names[0]), tx);
+  });
+}
+export function act(room: Room, name: string, intent: Intent, now = T0): Room {
+  return run(room, by(name, intent), now)!;
+}
+export function reject(room: Room, name: string, intent: Intent, now = T0): ErrorCode {
+  return fail(room, by(name, intent), now);
+}
+export const idOf = (r: Room, name: string) => pl(r, name).id;
+export function nameOf(room: Room, id: string): string {
+  const p = room.players.find((x) => x.id === id);
+  if (!p) throw new Error(`no player ${id}`);
+  return p.name;
+}
+export function ids(room: Room, name: string, ...values: MoneyValue[]): string[] {
+  const used = new Set<string>();
+  return values.map((v) => {
+    const c = pl(room, name).money.find((m) => m.value === v && !used.has(m.id));
+    if (!c) throw new Error(`${name} has no unused ${v} card`);
+    used.add(c.id);
+    return c.id;
+  });
+}
+export function cash(room: Room, name: string): number {
+  return pl(room, name).money.reduce((n, c) => n + c.value, 0);
+}
+export function count(room: Room, name: string, animal: Animal): number {
+  return pl(room, name).herd[animal];
 }
