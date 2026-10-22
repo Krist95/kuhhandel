@@ -33,7 +33,7 @@ export function startGame(room: Room, tx: Tx): void {
   room.game = {
     deck: shuffle(tx.rng, buildDeck()), donkeysRevealed: 0, activePlayerId: first.id,
     phase: { kind: "action", playerId: first.id }, deadline: null,
-    lastPayment: null, lastTrade: null, recordSeq: 0,
+    lastPayment: null, lastTrade: null, recordSeq: room.game?.recordSeq ?? 0,
   };
   addLog(room, `Game started. ${first.name} goes first.`);
   beginTurn(room, first.id, tx);

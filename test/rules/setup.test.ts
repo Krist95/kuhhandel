@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildDeck } from "../../src/rules/setup";
 import { ANIMALS } from "../../src/rules/types";
-import { NAMES, T0, act, by, cash, fail, game, joinAction, lobby, run } from "./helpers";
+import { NAMES, T0, act, by, cash, fail, game, joinAction, lobby, run, withTx } from "./helpers";
 
 describe("startGame", () => {
   it("deals starting money, empty herds and a shuffled 40-card deck", () => {
@@ -34,5 +34,9 @@ describe("startGame", () => {
     expect(r).toMatchObject({ status: "PLAYING", finishedAt: null, scores: null, settings: { decisionSeconds: 30 } });
     expect(r.players.map((p) => p.name)).toEqual(NAMES);
     expect([r.game!.deck.length, cash(r, "Anna")]).toEqual([40, 90]);
+  });
+  it("Play again keeps counting record ids instead of restarting at 1", () => {
+    const done = withTx(game(NAMES, { deck: [], herds: { Anna: { horse: 4 }, Ben: { cow: 4 }, Clara: { cat: 4 } } }), (d) => { d.game!.recordSeq = 5; });
+    expect(act(done, "Anna", { type: "playAgain" }, T0 + 1000).game!.recordSeq).toBe(5);
   });
 });

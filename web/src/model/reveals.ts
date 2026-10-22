@@ -3,28 +3,33 @@ import { animalsText } from "../../../src/rules/text";
 import { ANIMAL_NAME, MAX_TIES, type ScoreRow, type Settings } from "../../../src/rules/types";
 
 const SEEN_KEY = "kuhhandel.seenReveals";
-let memory: number[] = [];
+type SeenStore = Pick<Storage, "getItem" | "setItem">;
+let memory: { roomId: string; ids: number[] } = { roomId: "", ids: [] };
 
 export function revealToShow(reveal: TradeReveal | null, seen: ReadonlySet<number>): TradeReveal | null {
   return reveal !== null && !seen.has(reveal.id) ? reveal : null;
 }
 
-export function loadSeen(): Set<number> {
-  try {
-    const raw = sessionStorage.getItem(SEEN_KEY);
-    if (raw !== null) {
-      const parsed: unknown = JSON.parse(raw);
-      if (Array.isArray(parsed)) memory = parsed.filter((x): x is number => typeof x === "number");
-    }
-  } catch { /* fall back to memory */ }
-  return new Set(memory);
+export function loadSeen(store: SeenStore | null, roomId: string): Set<number> {
+  let raw: string | null | undefined;
+  try { raw = store?.getItem(SEEN_KEY); } catch { raw = undefined; /* unreadable: use memory */ }
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as { roomId?: unknown; ids?: unknown };
+      if (parsed.roomId === roomId && Array.isArray(parsed.ids)) {
+        return new Set(parsed.ids.filter((x): x is number => typeof x === "number"));
+      }
+    } catch { /* malformed */ }
+    return new Set();
+  }
+  return new Set(memory.roomId === roomId ? memory.ids : []);
 }
 
-export function markSeen(id: number): Set<number> {
-  const next = loadSeen();
+export function markSeen(store: SeenStore | null, roomId: string, id: number): Set<number> {
+  const next = loadSeen(store, roomId);
   next.add(id);
-  memory = [...next];
-  try { sessionStorage.setItem(SEEN_KEY, JSON.stringify(memory)); } catch { /* memory only */ }
+  memory = { roomId, ids: [...next] };
+  try { store?.setItem(SEEN_KEY, JSON.stringify(memory)); } catch { /* memory only */ }
   return next;
 }
 

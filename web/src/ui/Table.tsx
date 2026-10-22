@@ -15,11 +15,15 @@ import { RulesScreen } from "./RulesScreen";
 import { Toast } from "./Toast";
 import { TradeRevealModal } from "./TradeRevealModal";
 
+function seenStore(): Storage | null {
+  try { return sessionStorage; } catch { return null; }
+}
+
 export function Table(props: { room: RoomView }) {
   const { room } = props;
   const game = room.game;
   const [panel, setPanel] = useState<"rules" | "log" | "host" | null>(null);
-  const [seen, setSeen] = useState<Set<number>>(loadSeen);
+  const [seen, setSeen] = useState<Set<number>>(() => loadSeen(seenStore(), room.roomId));
   const meId = view.value?.me?.id ?? "";
   if (game === null) return null;
   const places = seatPositions(room.players, meId);
@@ -51,7 +55,7 @@ export function Table(props: { room: RoomView }) {
       {panel === "host" && <HostMenu status={room.status} onClose={() => setPanel(null)} />}
       {room.status === "PLAYING" && <BluffOverlay room={room} game={game} />}
       {room.status === "PLAYING" && reveal && (
-        <TradeRevealModal reveal={reveal} meId={meId} names={names} onOk={() => setSeen(markSeen(reveal.id))} />
+        <TradeRevealModal reveal={reveal} meId={meId} names={names} onOk={() => setSeen(markSeen(seenStore(), room.roomId, reveal.id))} />
       )}
       {room.status === "PAUSED" && <PauseOverlay hostName={names[room.hostId] ?? "?"} isHost={meId === room.hostId} />}
       <Toast />
