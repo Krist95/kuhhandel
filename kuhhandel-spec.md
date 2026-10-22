@@ -104,7 +104,7 @@ Brief disconnects never close the room.
 | Setting | Options | Default |
 |---|---|---|
 | **Cow trade money** | `swap` – winner takes loser's offer, loser takes winner's offer (official). `loserTakesBoth` – loser keeps own offer and also receives winner's offer. | `swap` |
-| **Time per decision** | 10, 20, 30, 60 seconds | 20 |
+| **Time per decision** | 10, 20, 30, 60, 120 seconds | 20 |
 
 The chosen settings are shown in the in-game info/rules screen.
 
