@@ -10,7 +10,7 @@ export function buildDeck(): Animal[] {
 
 /** A money card whose ID is unique among all cards currently held in the room. */
 export function mintCard(room: Room, tx: Tx, value: MoneyValue): MoneyCard {
-  const held = new Set(room.players.flatMap((p) => p.money.map((c) => c.id)));
+  const held = new Set([...room.players.flatMap((p) => p.money.map((c) => c.id)), ...room.players.map((p) => p.id)]);
   let id = randomId(tx.rng);
   while (held.has(id)) id = randomId(tx.rng);
   return { id, value };

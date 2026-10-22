@@ -25,7 +25,7 @@ describe("views", () => {
     for (const n of NAMES) {
       const v = view(r, n), s = json(v);
       expect(v.me!.money.map((c) => c.id).sort()).toEqual(cardIdsOf(r, n).sort());
-      for (const o of NAMES.filter((x) => x !== n)) for (const id of cardIdsOf(r, o)) if (!r.players.some((x) => x.id === id)) expect(s).not.toContain(id); // the test rng can reuse a public player id as a card id
+      for (const o of NAMES.filter((x) => x !== n)) for (const id of cardIdsOf(r, o)) expect(s).not.toContain(id);
       for (const t of NAMES.map(tok)) expect(s).not.toContain(t);
       expect(Object.keys(v.room!.players[0]!).sort()).toEqual(["away", "connected", "herd", "id", "moneyCount", "name", "out", "seat"]);
     }

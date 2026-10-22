@@ -9,6 +9,8 @@ describe("startGame", () => {
     expect(r.status).toBe("PLAYING");
     for (const p of r.players) expect(p.money.map((c) => c.value).sort((a, b) => a - b)).toEqual([0, 0, 10, 10, 10, 10, 50]);
     expect(new Set(r.players.flatMap((p) => p.money.map((c) => c.id))).size).toBe(21);
+    const pids = new Set(r.players.map((p) => p.id));
+    for (const p of r.players) for (const c of p.money) expect(pids.has(c.id)).toBe(false);
     for (const a of ANIMALS) expect(r.game!.deck.filter((x) => x === a)).toHaveLength(4);
     expect(r.game!.deck).toHaveLength(40);
     expect(r.game!.deck).not.toEqual(buildDeck());
