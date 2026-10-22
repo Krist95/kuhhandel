@@ -3,7 +3,7 @@ import { RuleError } from "./errors";
 import { randomId } from "./rng";
 import {
   ANIMALS, DECISION_SECONDS, DEFAULT_SETTINGS, ROOM_ID_ALPHABET,
-  type Action, type Herd, type Intent, type Player, type Room, type Seat,
+  type Action, type CloseReason, type Herd, type Intent, type Player, type Room, type Seat,
 } from "./types";
 
 export function normalizeName(raw: string, max: number): string | null {
@@ -105,8 +105,8 @@ export function setConnected(room: Room, token: string, connected: boolean, tx: 
   }
 }
 
-export function closeRoom(tx: Tx): null {
-  tx.events.push({ kind: "closed", reason: "hostClosed" });
+export function closeRoom(tx: Tx, reason: CloseReason = "hostClosed"): null {
+  tx.events.push({ kind: "closed", reason });
   return null;
 }
 

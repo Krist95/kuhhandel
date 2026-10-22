@@ -89,6 +89,9 @@ export function auc(room: Room): Auction {
   if (phase.kind !== "bidding" && phase.kind !== "decision" && phase.kind !== "bluff") throw new Error(`no auction in phase ${phase.kind}`);
   return phase.auction;
 }
+export function tickAt(room: Room | null, now: number): Room | null {
+  return run(room, { type: "tick" }, now);
+}
 export function passAll(room: Room, now = T0): Room {
   let r = room;
   while (r.game!.phase.kind === "bidding") r = act(r, nameOf(r, r.game!.phase.auction.turnId!), { type: "pass" }, now);

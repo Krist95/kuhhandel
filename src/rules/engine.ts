@@ -3,9 +3,10 @@ import { bid, decide, pass } from "./auction";
 import { offer, respond } from "./cowTrade";
 import { pay } from "./payment";
 import { startGame } from "./setup";
+import { checkHostTransfer, markActive, pause, resume, settleAway, tick } from "./timers";
 import { chooseAction } from "./turn";
 import { closeRoom, createRoom, joinRoom, leaveSeat, removePlayer, requireHost, setConnected, updateSettings } from "./lobby";
-import { LOG_LIMIT, type Action, type Ctx, type Outcome, type Player, type Room, type RoomEvent, type Seat } from "./types";
+import { LOG_LIMIT, type Action, type Ctx, type Intent, type Outcome, type Player, type Room, type RoomEvent, type Seat } from "./types";
 
 export interface Tx extends Ctx { events: RoomEvent[] }
 
@@ -33,14 +34,29 @@ function apply(room: Room | null, action: Action, tx: Tx): Room | null {
       return room;
     case "connect":
     case "disconnect":
-      if (room) setConnected(room, action.token, action.type === "connect", tx);
+      if (room) {
+        setConnected(room, action.token, action.type === "connect", tx);
+        if (action.type === "connect") checkHostTransfer(room, tx.now);
+      }
       return room;
     case "tick":
-      return room;
+      return room ? tick(room, tx) : null;
     case "intent": {
       if (!room) throw new RuleError("notSeated");
       const p = playerByToken(room, action.token);
-      const i = action.intent;
+      const next = applyIntent(room, p, action.intent, tx);
+      if (next && (next.status === "PLAYING" || next.status === "PAUSED")) {
+        markActive(next, p);
+        if (next.status === "PLAYING") settleAway(next, tx);
+      }
+      return next;
+    }
+  }
+}
+
+function applyIntent(room: Room, p: Player, i: Intent, tx: Tx): Room | null {
+  {
+    {
       switch (i.type) {
         case "leaveSeat":
           needLobby(room);
@@ -94,6 +110,16 @@ function apply(room: Room | null, action: Action, tx: Tx): Room | null {
         case "cowTradeResponse":
           needPlaying(room);
           respond(room, p, i.cardIds, tx);
+          return room;
+        case "pause":
+          pause(room, p, tx);
+          return room;
+        case "resume":
+          resume(room, p, tx);
+          return room;
+        case "imBack":
+          if (room.status !== "PLAYING" && room.status !== "PAUSED") throw new RuleError("invalid");
+          markActive(room, p);
           return room;
         default:
           throw new RuleError("invalid");
