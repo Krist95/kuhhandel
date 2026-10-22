@@ -12,7 +12,7 @@ export function RulesScreen(props: { settings: Settings; onClose: () => void }) 
           <p><b>Buy.</b> The auctioneer may take the card by paying the top bidder the top bid.</p>
           <p><b>Cow trade.</b> Challenge a player who holds the same animal. Both secretly put down money; the higher total wins the animals. A tie repeats the trade, up to {MAX_TIES} times.</p>
           <p><b>Donkeys.</b> Each donkey pays everyone: {DONKEY_PAYOUTS.join(", ")}.</p>
-          <p><b>Scoring.</b> Each complete set of four is worth its value; the sum is multiplied by the number of sets. Highest score wins; equal scores share the win.</p>
+          <p><b>Scoring.</b> Each complete set of four is worth its value; the sum is multiplied by the number of sets. Highest score wins. On equal scores, more complete sets wins; only an equal score and an equal number of sets share the win.</p>
           <p><b>Away.</b> After {AWAY_AFTER} timeouts in a row you are marked Away and play automatically until you return.</p>
           <h3>Settings</h3>
           <p>{moneyRuleText(props.settings.moneyRule)}</p>

@@ -3,6 +3,11 @@ import type { MoneyValue } from "../../../src/rules/types";
 import { revealText } from "../model/reveals";
 import { MoneyNote } from "./MoneyNote";
 
+/** Where the seen reveal IDs are kept for this tab (null when storage is blocked; reveals.ts then keeps them in memory). */
+export function seenStore(): Storage | null {
+  try { return sessionStorage; } catch { return null; }
+}
+
 function Offer(props: { name: string; values: MoneyValue[] }) {
   return (
     <div class="row notes">

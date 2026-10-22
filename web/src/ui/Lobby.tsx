@@ -3,7 +3,7 @@ import type { RoomView } from "../../../src/protocol";
 import { DECISION_SECONDS } from "../../../src/rules/types";
 import { lobbySeats, savedPassword, shareText } from "../model/lobby";
 import { sendOrToast } from "../net/socket";
-import { toast, view } from "../state";
+import { homeScreen, toast, view } from "../state";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 function password(): string {
@@ -89,7 +89,7 @@ export function Lobby(props: { room: RoomView }) {
         </ul>
         {toast.value && <p class="error" onClick={() => { toast.value = null; }}>{toast.value}</p>}
         <div class="row">
-          <button class="secondary" onClick={() => sendOrToast({ type: "leaveSeat" })}>Leave seat</button>
+          <button class="secondary" onClick={() => { homeScreen.value = "home"; sendOrToast({ type: "leaveSeat" }); }}>Leave seat</button>
           {isHost && <button disabled={!canStart} onClick={() => sendOrToast({ type: "startGame" })}>Start game</button>}
           {isHost && <button class="danger" onClick={() => setConfirmClose(true)}>Close room</button>}
         </div>

@@ -13,11 +13,7 @@ import { OpponentPanel } from "./OpponentPanel";
 import { PauseOverlay } from "./PauseOverlay";
 import { RulesScreen } from "./RulesScreen";
 import { Toast } from "./Toast";
-import { TradeRevealModal } from "./TradeRevealModal";
-
-function seenStore(): Storage | null {
-  try { return sessionStorage; } catch { return null; }
-}
+import { seenStore, TradeRevealModal } from "./TradeRevealModal";
 
 export function Table(props: { room: RoomView }) {
   const { room } = props;
@@ -36,29 +32,32 @@ export function Table(props: { room: RoomView }) {
     return p ? <OpponentPanel player={p} isHost={p.id === room.hostId} isTurn={p.id === game.activePlayerId} /> : null;
   };
   return (
-    <div class={`table${room.status === "PAUSED" ? " paused-table" : ""}`}>
-      <div class="corner">
-        <button class="small secondary" aria-label="Info" onClick={() => setPanel("rules")}>i</button>
-        <button class="small secondary" aria-label="Log" onClick={() => setPanel(panel === "log" ? null : "log")}>Log</button>
-        {meId === room.hostId && <button class="small secondary" aria-label="Host menu" onClick={() => setPanel("host")}>Host</button>}
+    <>
+      <div class={`table${room.status === "PAUSED" ? " paused-table" : ""}`}>
+        <div class="corner">
+          <button class="small secondary" aria-label="Info" onClick={() => setPanel("rules")}>i</button>
+          <button class="small secondary" aria-label="Log" onClick={() => setPanel(panel === "log" ? null : "log")}>Log</button>
+          {meId === room.hostId && <button class="small secondary" aria-label="Host menu" onClick={() => setPanel("host")}>Host</button>}
+        </div>
+        <div class="cell c1 r1">{at("topLeft")}</div>
+        <div class="cell c2 r1">{at("top")}</div>
+        <div class="cell c3 r1">{at("topRight")}</div>
+        <div class="cell c1 r2">{at("left")}</div>
+        <div class="cell c2 r2"><Center room={room} game={game} /></div>
+        <div class="cell c3 r2">{at("right")}</div>
+        <div class="cell my r3">{me && <MyArea player={me} />}</div>
+        <div class="action-cell cell c3 r3"><ActionBar /></div>
+        {panel === "log" && <GameLog log={room.log} onClose={() => setPanel(null)} />}
+        {panel === "rules" && <RulesScreen settings={room.settings} onClose={() => setPanel(null)} />}
+        {panel === "host" && <HostMenu status={room.status} onClose={() => setPanel(null)} />}
+        {room.status === "PLAYING" && <BluffOverlay room={room} game={game} />}
+        {room.status === "PLAYING" && reveal && (
+          <TradeRevealModal reveal={reveal} meId={meId} names={names} onOk={() => setSeen(markSeen(seenStore(), room.roomId, reveal.id))} />
+        )}
       </div>
-      <div class="cell c1 r1">{at("topLeft")}</div>
-      <div class="cell c2 r1">{at("top")}</div>
-      <div class="cell c3 r1">{at("topRight")}</div>
-      <div class="cell c1 r2">{at("left")}</div>
-      <div class="cell c2 r2"><Center room={room} game={game} /></div>
-      <div class="cell c3 r2">{at("right")}</div>
-      <div class="cell my r3">{me && <MyArea player={me} />}</div>
-      <div class="action-cell cell c3 r3"><ActionBar /></div>
-      {panel === "log" && <GameLog log={room.log} onClose={() => setPanel(null)} />}
-      {panel === "rules" && <RulesScreen settings={room.settings} onClose={() => setPanel(null)} />}
-      {panel === "host" && <HostMenu status={room.status} onClose={() => setPanel(null)} />}
-      {room.status === "PLAYING" && <BluffOverlay room={room} game={game} />}
-      {room.status === "PLAYING" && reveal && (
-        <TradeRevealModal reveal={reveal} meId={meId} names={names} onOk={() => setSeen(markSeen(seenStore(), room.roomId, reveal.id))} />
-      )}
+      {/* Outside the greyed-out table: the filter would dim them and become their containing block. */}
       {room.status === "PAUSED" && <PauseOverlay hostName={names[room.hostId] ?? "?"} isHost={meId === room.hostId} />}
       <Toast />
-    </div>
+    </>
   );
 }

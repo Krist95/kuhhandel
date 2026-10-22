@@ -25,6 +25,8 @@ export function onServerMessage(msg: ServerMessage, localNow: number): void {
       toast.value = msg.message;
       break;
     case "roomClosed":
+      // Sent to every socket; a visitor who wasn't in the room (e.g. on the Create form) stays where they are.
+      if (!view.value?.room) break;
       notice.value = CLOSED_COPY[msg.reason];
       homeScreen.value = "home";
       break;
