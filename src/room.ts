@@ -3,6 +3,7 @@ import { hashPassword, verifyPassword } from "./password";
 import { parseClientMessage, type ClientMessage, type ServerMessage } from "./protocol";
 import { reduce } from "./rules/engine";
 import { ERROR_TEXT, type ErrorCode } from "./rules/errors";
+import { nextDeadline } from "./rules/timers";
 import type { Action, Room } from "./rules/types";
 import { buildView } from "./rules/view";
 
@@ -119,14 +120,27 @@ export class GameRoom extends DurableObject<Env> {
     await this.dispatch({ type: "join", token, playerName: msg.playerName, seat: msg.seat }, now, ws);
   }
 
-  /** The only place state changes: reduce, persist, then tell every socket. */
-  private async dispatch(action: Action, now: number, origin: WebSocket): Promise<void> {
+  async alarm(): Promise<void> {
+    await this.runTimers(Date.now());
+  }
+
+  /** Applies every timer that is due at `now`. Also the test seam. */
+  async runTimers(now: number): Promise<void> {
+    await this.dispatch({ type: "tick" }, now, null);
+  }
+
+  /** The only place state changes: reduce, persist, schedule the alarm, then tell every socket. */
+  private async dispatch(action: Action, now: number, origin: WebSocket | null): Promise<void> {
     const out = reduce(this.room, action, { now, rng: cryptoRng() });
-    if (!out.ok) return sendError(origin, out.error.code);
+    if (!out.ok) return origin ? sendError(origin, out.error.code) : undefined;
     const state = out.state;
     this.room = state;
     if (state) await this.ctx.storage.put("room", state);
     else await this.ctx.storage.deleteAll();
+    // A deadline already in the past is passed as-is: the runtime runs a past-due alarm promptly.
+    const at = nextDeadline(state);
+    if (at === null) await this.ctx.storage.deleteAlarm();
+    else await this.ctx.storage.setAlarm(at);
     const sockets = this.ctx.getWebSockets();
     for (const e of out.events) {
       if (e.kind === "removed") {
