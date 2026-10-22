@@ -2,6 +2,7 @@ import { startConnection } from "./net/socket";
 import { conn, homeScreen, view } from "./state";
 import { Home } from "./ui/Home";
 import { Lobby } from "./ui/Lobby";
+import { Table } from "./ui/Table";
 import { RoomForm } from "./ui/RoomForm";
 import { RotateOverlay } from "./ui/RotateOverlay";
 
@@ -20,7 +21,7 @@ function Screen() {
   switch (v.room.status) {
     case "LOBBY": return <Lobby room={v.room} />;
     case "PLAYING":
-    case "PAUSED": return <div class="center">Table (Task 15)</div>;
+    case "PAUSED": return <Table room={v.room} />;
     case "FINISHED": return <div class="center">End screen (Task 17)</div>;
   }
 }
