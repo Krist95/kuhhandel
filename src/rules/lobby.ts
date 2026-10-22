@@ -65,6 +65,7 @@ export function leaveSeat(room: Room, p: Player, tx: Tx): Room | null {
   room.players = room.players.filter((x) => x.id !== p.id);
   addLog(room, `${p.name} left.`);
   if (room.players.length === 0) return closeRoom(tx);
+  if (room.nobodySince === null && room.players.every((x) => !x.connected)) room.nobodySince = tx.now;
   if (room.hostId === p.id) {
     const next = nextClockwise(room, p.seat, () => true)!;
     room.hostId = next.id;

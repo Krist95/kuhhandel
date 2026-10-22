@@ -121,6 +121,14 @@ describe("host transfer and closing", () => {
     expect(outcome(done, { type: "tick" }, T0 + 300_000)).toEqual({ ok: true, state: null, events: [{ kind: "closed", reason: "finished" }] });
     expect(tickAt(act(done, "Anna", { type: "playAgain" }, T0 + 60_000), T0 + 300_000)!.status).toBe("PLAYING");
   });
+  it("starts the inactive clock when the last connected player leaves", () => {
+    let r = lobby(["Anna", "Ben", "Clara"]);
+    r = run(run(r, { type: "disconnect", token: tok("Ben") }), { type: "disconnect", token: tok("Clara") })!;
+    r = act(r, "Anna", { type: "leaveSeat" }, T0 + 1_000);
+    expect(r.nobodySince).toBe(T0 + 1_000);
+    expect(nextDeadline(r)).toBe(T0 + 1_000 + 600_000);
+    expect(outcome(r, { type: "tick" }, T0 + 1_000 + 600_000)).toEqual({ ok: true, state: null, events: [{ kind: "closed", reason: "inactive" }] });
+  });
   it("reports the earliest pending deadline", () => {
     expect(nextDeadline(g())).toBe(T0 + D);
     expect(nextDeadline(run(lobby(), { type: "disconnect", token: tok("Anna") }, T0 + 1_000))).toBe(T0 + 121_000);
