@@ -60,9 +60,7 @@ export function Center(props: { room: RoomView; game: GameView }) {
       </div>
       {card && <AnimalCard animal={card} size="card" />}
       {lines}
-      {room.status === "PAUSED"
-        ? <div class="paused">Game paused by {nameOf(room.hostId)}</div>
-        : <Countdown deadline={game.deadline} label={waiting ? nameOf(waiting) : null} />}
+      {room.status !== "PAUSED" && <Countdown deadline={game.deadline} label={waiting ? nameOf(waiting) : null} />}
     </div>
   );
 }

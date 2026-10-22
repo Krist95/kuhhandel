@@ -1,5 +1,7 @@
 import { startConnection } from "./net/socket";
 import { conn, homeScreen, view } from "./state";
+import { EndScreen } from "./ui/EndScreen";
+import { Toast } from "./ui/Toast";
 import { Home } from "./ui/Home";
 import { Lobby } from "./ui/Lobby";
 import { Table } from "./ui/Table";
@@ -22,7 +24,7 @@ function Screen() {
     case "LOBBY": return <Lobby room={v.room} />;
     case "PLAYING":
     case "PAUSED": return <Table room={v.room} />;
-    case "FINISHED": return <div class="center">End screen (Task 17)</div>;
+    case "FINISHED": return <><EndScreen room={v.room} /><Toast /></>;
   }
 }
 

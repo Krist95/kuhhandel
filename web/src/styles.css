@@ -96,3 +96,14 @@ input, select, textarea { font: inherit; padding: 0.3em 0.6em; border-radius: 0.
 .money-card { min-width: 3em; padding: 0.3em 0.5em; background: var(--paper); color: var(--ink); border: 2px solid transparent; }
 .money-card.selected { border-color: var(--accent); background: var(--accent); }
 .total { font-weight: 700; }
+.toast { position: fixed; bottom: 0.6em; left: 50%; transform: translateX(-50%); z-index: 80; background: var(--accent); color: var(--ink); padding: 0.4em 1em; border-radius: 0.5em; }
+.log-panel { position: absolute; top: 2em; right: 0.2em; z-index: 6; width: 45%; max-height: 80%; display: flex; flex-direction: column; background: var(--felt-dark); border: 1px solid var(--muted); border-radius: 0.6em; padding: 0.3em 0.5em; box-sizing: border-box; }
+.log-head { display: flex; justify-content: space-between; align-items: center; }
+.log-body { overflow-y: auto; min-height: 0; text-align: left; }
+.log-line { padding: 0.1em 0; border-bottom: 1px solid var(--felt); }
+.pause-backdrop { z-index: 60; }
+.rules-body { overflow-y: auto; min-height: 0; text-align: left; }
+.rules-body p { margin: 0.3em 0; }
+.end-screen { gap: 0.4em; }
+.rank-row { padding: 0.2em 0.6em; border-radius: 0.4em; text-align: left; }
+.rank-row.winner { background: var(--felt); border: 1px solid var(--accent); }
