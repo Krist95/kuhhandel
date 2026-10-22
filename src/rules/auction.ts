@@ -1,5 +1,6 @@
 import { addLog, nextClockwise, playerById, type Tx } from "./engine";
 import { RuleError } from "./errors";
+import { cashOf } from "./payment";
 import { mintCard } from "./setup";
 import { endTurn, inGame, setPhase } from "./turn";
 import { ANIMAL_NAME, DONKEY_PAYOUTS, MAX_BID, type Player, type Auction, type Room } from "./types";
@@ -83,5 +84,38 @@ function afterBidTurn(room: Room, auction: Auction, currentId: string, tx: Tx): 
       break;
     }
   }
+  setPhase(room, { kind: "bidding", auction }, tx);
+}
+
+export function decide(room: Room, p: Player, decision: "sell" | "buy", tx: Tx): void {
+  const phase = room.game!.phase;
+  if (phase.kind !== "decision" || phase.auction.auctioneerId !== p.id) throw new RuleError("notYourTurn");
+  const auction = phase.auction;
+  const bidder = playerById(room, auction.topBidderId!);
+  const base = { kind: "payment", card: auction.card, amount: auction.topBid } as const;
+  if (decision === "buy") {
+    if (cashOf(p.money) < auction.topBid) throw new RuleError("buyDisabled");
+    return setPhase(room, { ...base, payerId: p.id, receiverId: bidder.id }, tx);
+  }
+  const total = cashOf(bidder.money);
+  if (total >= auction.topBid) return setPhase(room, { ...base, payerId: bidder.id, receiverId: p.id }, tx);
+  const cards = bidder.money.map((c) => c.value).sort((a, b) => a - b);
+  auction.excluded.push(bidder.id);
+  addLog(room, `Bluff! ${bidder.name} bid ${auction.topBid} but only has ${total} (${cards.join(", ")}).`);
+  setPhase(room, { kind: "bluff", auction, blufferId: bidder.id, bid: auction.topBid, cards }, tx);
+}
+
+export function endBluffReveal(room: Room, tx: Tx): void {
+  const phase = room.game!.phase;
+  if (phase.kind !== "bluff") throw new RuleError("invalid");
+  const auction = phase.auction;
+  const bidders = eligibleBidders(room, auction.auctioneerId, auction.excluded);
+  addLog(room, `Bidding on the ${ANIMAL_NAME[auction.card][0]} restarts.`);
+  if (bidders.length === 0) return giveFree(room, auction, tx);
+  auction.bidders = bidders;
+  auction.passed = [];
+  auction.topBid = 0;
+  auction.topBidderId = null;
+  auction.turnId = bidders[0];
   setPhase(room, { kind: "bidding", auction }, tx);
 }

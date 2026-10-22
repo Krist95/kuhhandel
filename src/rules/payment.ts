@@ -1,5 +1,8 @@
+import { addLog, playerById, type Tx } from "./engine";
 import { RuleError } from "./errors";
-import type { MoneyCard, MoneyValue, Player } from "./types";
+import { cardsText } from "./text";
+import { endTurn } from "./turn";
+import { ANIMAL_NAME, type MoneyCard, type MoneyValue, type Player, type Room } from "./types";
 
 const DENOMINATIONS: readonly MoneyValue[] = [10, 50, 100, 200, 500];
 
@@ -42,4 +45,26 @@ export function autoPay(hand: readonly MoneyCard[], amount: number): MoneyCard[]
   const chosen = best as { use: number[] } | null;
   if (!chosen) throw new RuleError("underpaid");
   return groups.flatMap((g, i) => g.slice(0, chosen.use[i]));
+}
+
+export function pay(room: Room, p: Player, cardIds: readonly string[], tx: Tx): void {
+  const phase = room.game!.phase;
+  if (phase.kind !== "payment" || phase.payerId !== p.id) throw new RuleError("notYourTurn");
+  const cards = pickCards(p.money, cardIds);
+  if (cashOf(cards) < phase.amount) throw new RuleError("underpaid");
+  settlePayment(room, cards, tx);
+}
+
+export function settlePayment(room: Room, cards: readonly MoneyCard[], tx: Tx): void {
+  const game = room.game!;
+  const phase = game.phase;
+  if (phase.kind !== "payment") throw new RuleError("invalid");
+  const payer = playerById(room, phase.payerId);
+  const receiver = playerById(room, phase.receiverId);
+  removeCards(payer, cards);
+  receiver.money.push(...cards);
+  payer.herd[phase.card]++;
+  game.lastPayment = { id: ++game.recordSeq, payerId: payer.id, receiverId: receiver.id, amount: phase.amount, cards: cards.map((c) => c.value) };
+  addLog(room, `${payer.name} bought the ${ANIMAL_NAME[phase.card][0]} for ${phase.amount} (${cardsText(cards.length)}).`);
+  endTurn(room, tx);
 }

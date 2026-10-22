@@ -1,5 +1,6 @@
 import { ERROR_TEXT, RuleError } from "./errors";
-import { bid, pass } from "./auction";
+import { bid, decide, pass } from "./auction";
+import { pay } from "./payment";
 import { startGame } from "./setup";
 import { chooseAction } from "./turn";
 import { closeRoom, createRoom, joinRoom, leaveSeat, removePlayer, requireHost, setConnected, updateSettings } from "./lobby";
@@ -78,7 +79,13 @@ function apply(room: Room | null, action: Action, tx: Tx): Room | null {
           pass(room, p, tx);
           return room;
         case "auctioneerDecision":
+          needPlaying(room);
+          decide(room, p, i.decision, tx);
+          return room;
         case "pay":
+          needPlaying(room);
+          pay(room, p, i.cardIds, tx);
+          return room;
         case "cowTradeOffer":
         case "cowTradeResponse":
           needPlaying(room);
