@@ -21,6 +21,8 @@ npm run dev:server
 npm run dev:web
 ```
 
+Vite proxies `/ws` to `wrangler dev` on localhost:8787.
+
 Open http://localhost:5173. Phones on the same Wi-Fi can open `http://<pc-ip>:5173`, but wake lock and PWA install need HTTPS.
 
 ## Tests and checks
@@ -42,6 +44,11 @@ npm run deploy
 
 `npm run deploy` builds the client and then runs `wrangler deploy`. The output should list the `GAME_ROOM` Durable Object binding and a `https://kuhhandel.<subdomain>.workers.dev` URL.
 
+### First-deploy checks
+
+- The deploy output lists the `GAME_ROOM` binding and, on the first deploy, applies the `v1` Durable Object migration.
+- Create and join a room right after deploying. This confirms that PBKDF2 at 100,000 iterations fits the Free plan CPU limit.
+
 ### Optional auto-deploy
 
 Connect the GitHub repository in Cloudflare Workers Builds with build command `npm run build` and deploy command `npx wrangler deploy`.
@@ -56,3 +63,8 @@ Try on 3 or more real phones, covering what automated tests can't:
 - The bluff overlay lasts 5 s for everyone. The trade reveal shows only on the two phones involved.
 - A player goes Away after 3 timeouts; "I'm back" clears it.
 - The room closes 5 min after the end screen, and Play again cancels that.
+- At 740×360, check that these fit without scrolling: the lobby's host side column, the Offer and Pay money sheets with a large hand, and the rules and log panels.
+- Opponent panels wrap their animal chips cleanly when a player holds many animals.
+- Animal frame colours look right, and a complete set gets the gold outline.
+- Reconnect after closing a tab (close handshake) and after switching between Wi-Fi and cellular. The "Reconnecting…" badge appears and then clears.
+- On iPhone, install the PWA before joining a game. The home-screen app has separate storage, so it gets a new token and seat.
