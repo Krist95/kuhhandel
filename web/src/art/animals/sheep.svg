@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><g stroke="#1E1E1E" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#FFFFFF" d="M8 100C6 92 12 86 18 86C18 80 26 76 32 79C34 74 42 72 46 76C50 72 58 73 60 77C64 73 72 75 74 80C80 77 88 82 86 88C92 88 96 94 94 100Z"/>
+<path fill="#4F4741" d="M36 40C28 35 17 36 11 41C17 47 28 48 36 45Z"/>
+<path fill="#4F4741" d="M64 40C72 35 83 36 89 41C83 47 72 48 64 45Z"/>
+<path fill="#4F4741" d="M50 24C59 24 64 29 64 38C64 48 62 58 60 64C58 70 55 73 50 73C45 73 42 70 40 64C38 58 36 48 36 38C36 29 41 24 50 24Z"/>
+<path fill="#FFFFFF" d="M32 33C27 28 30 20 37 20C37 13 45 10 50 14C54 9 63 11 64 18C70 17 75 24 71 29C74 34 69 39 63 36C58 39 54 36 50 38C46 36 42 39 37 36C33 38 29 36 32 33Z"/>
+<g stroke-width="3">
+<circle fill="#FFFFFF" cx="43" cy="47" r="5"/>
+<circle fill="#FFFFFF" cx="57" cy="47" r="5"/>
+</g>
+<circle fill="#1E1E1E" stroke="none" cx="43" cy="47" r="1.9"/>
+<circle fill="#1E1E1E" stroke="none" cx="57" cy="47" r="1.9"/>
+<path fill="#FFFFFF" stroke-width="3" d="M43 62Q50 64.5 57 62L56.5 65.5Q50 68 43.5 65.5Z"/>
+</g></svg>
