@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { deriveControls, type Enabled } from "../model/controls";
+import { deriveControls, sheetKey, type Controls, type Enabled } from "../model/controls";
 import { send } from "../net/socket";
 import { view } from "../state";
 import { AwayBanner } from "./AwayBanner";
@@ -18,9 +18,14 @@ function Reasoned(props: { label: string; en: Enabled; onClick: () => void }) {
 
 export function ActionBar() {
   const v = view.value;
-  const [open, setOpen] = useState(false);
   if (!v) return null;
   const c = deriveControls(v);
+  return <ControlView key={sheetKey(c, v.room?.game?.deadline ?? null)} c={c} />;
+}
+
+function ControlView(props: { c: Controls }) {
+  const c = props.c;
+  const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
   switch (c.kind) {
     case "watch": return null;

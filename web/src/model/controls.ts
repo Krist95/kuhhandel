@@ -82,3 +82,8 @@ export function deriveControls(view: View): Controls {
       return { kind: "watch", waitingOnId };
   }
 }
+
+/** Identity of one control instance: changes with the kind and with each new decision (deadline). */
+export function sheetKey(c: Controls, deadline: number | null): string {
+  return `${c.kind}:${deadline ?? "none"}`;
+}

@@ -4,7 +4,7 @@ import { MAX_BID } from "../../../src/rules/types";
 import type { Room } from "../../../src/rules/types";
 import { buildView } from "../../../src/rules/view";
 import { act, game, ids, idOf, NAMES, pl, tok, T0, withTx } from "../../../test/rules/helpers";
-import { bidStep, canSubmitBid, deriveControls, waitingOnPublic } from "./controls";
+import { bidStep, canSubmitBid, deriveControls, sheetKey, waitingOnPublic } from "./controls";
 
 const terms = { defenderId: "d", animal: "cow", count: 1 } as never;
 describe("waitingOnPublic", () => {
@@ -61,4 +61,14 @@ describe("deriveControls", () => {
 it("adds quick raises to the field and validates amounts", () => {
   expect(bidStep(40, 50)).toBe(90);
   expect([canSubmitBid(40, 40), canSubmitBid(45, 40), canSubmitBid(30, 40), canSubmitBid(MAX_BID + 10, 40)]).toEqual([true, false, false, false]);
+});
+
+describe("sheetKey", () => {
+  it("differs across kinds and across consecutive decisions of the same kind", () => {
+    const pay = { kind: "pay", amount: 20 } as const;
+    expect(sheetKey(pay, 100)).toBe(sheetKey(pay, 100));
+    expect(sheetKey(pay, 100)).not.toBe(sheetKey(pay, 200));
+    expect(sheetKey(pay, 100)).not.toBe(sheetKey({ kind: "away" }, 100));
+    expect(sheetKey(pay, null)).not.toBe(sheetKey(pay, 100));
+  });
 });
