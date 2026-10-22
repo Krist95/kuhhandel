@@ -2,6 +2,7 @@ import type { ComponentChildren } from "preact";
 import type { GameView, RoomView } from "../../../src/protocol";
 import { animalsText, cardsText } from "../../../src/rules/text";
 import { MAX_TIES, type Animal } from "../../../src/rules/types";
+import { CARD_BACK } from "../art";
 import { waitingOnPublic } from "../model/controls";
 import { AnimalCard } from "./AnimalCard";
 import { Countdown } from "./Countdown";
@@ -46,6 +47,11 @@ export function Center(props: { room: RoomView; game: GameView }) {
       lines.push(
         <div>
           {nameOf(ph.challengerId)} vs {nameOf(ph.terms.defenderId)} · {animalsText(ph.terms.count, ph.terms.animal)} · {nameOf(ph.challengerId)} put down {cardsText(ph.offerCount)}
+        </div>,
+      );
+      lines.push(
+        <div class="row notes" aria-hidden="true">
+          {Array.from({ length: ph.offerCount }, (_, i) => <img key={i} class="money-note chip" src={CARD_BACK} alt="" />)}
         </div>,
       );
       if (ph.ties > 0) lines.push(<div>Repeat {ph.ties} of {MAX_TIES}</div>);

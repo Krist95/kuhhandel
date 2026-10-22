@@ -1,5 +1,6 @@
 import type { GameView, RoomView } from "../../../src/protocol";
 import { Countdown } from "./Countdown";
+import { MoneyNote } from "./MoneyNote";
 
 export function BluffOverlay(props: { room: RoomView; game: GameView }) {
   const ph = props.game.phase;
@@ -9,7 +10,7 @@ export function BluffOverlay(props: { room: RoomView; game: GameView }) {
     <div class="dialog-backdrop" role="dialog" aria-modal="true">
       <div class="dialog">
         <h2>Bluff! {name} bid {ph.bid}</h2>
-        <div class="row">{ph.cards.map((v, i) => <span key={i} class="money-card">{v}</span>)}</div>
+        <div class="row notes">{ph.cards.map((v, i) => <MoneyNote key={i} value={v} size="chip" />)}</div>
         <Countdown deadline={props.game.deadline} label={null} />
       </div>
     </div>

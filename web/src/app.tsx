@@ -1,5 +1,6 @@
 import { startConnection } from "./net/socket";
 import { conn, homeScreen, view } from "./state";
+import { ArtPreview } from "./ui/ArtPreview";
 import { EndScreen } from "./ui/EndScreen";
 import { Toast } from "./ui/Toast";
 import { Home } from "./ui/Home";
@@ -29,6 +30,8 @@ function Screen() {
 }
 
 export function App() {
+  // Dev-only art review page (http://localhost:5173/?art); the DEV check removes it from production builds.
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has("art")) return <ArtPreview />;
   return (
     <>
       <Screen />

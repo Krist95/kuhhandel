@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90" width="160" height="90" font-family="system-ui, sans-serif">
+<g stroke="#1E1E1E" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#7A2E3A" d="M10 2H150A8 8 0 0 1 158 10V80A8 8 0 0 1 150 88H10A8 8 0 0 1 2 80V10A8 8 0 0 1 10 2Z"/>
+<path fill="none" stroke="#FFFFFF" stroke-width="3" d="M12 8H148A4 4 0 0 1 152 12V78A4 4 0 0 1 148 82H12A4 4 0 0 1 8 78V12A4 4 0 0 1 12 8Z"/>
+<path fill="none" stroke="#FFFFFF" stroke-width="3" d="M15 16a3 3 0 1 0 6 0a3 3 0 1 0-6 0M31 16a3 3 0 1 0 6 0a3 3 0 1 0-6 0M47 16a3 3 0 1 0 6 0a3 3 0 1 0-6 0M111 16a3 3 0 1 0 6 0a3 3 0 1 0-6 0M127 16a3 3 0 1 0 6 0a3 3 0 1 0-6 0M143 16a3 3 0 1 0 6 0a3 3 0 1 0-6 0M23 31a3 3 0 1 0 6 0a3 3 0 1 0-6 0M39 31a3 3 0 1 0 6 0a3 3 0 1 0-6 0M119 31a3 3 0 1 0 6 0a3 3 0 1 0-6 0M135 31a3 3 0 1 0 6 0a3 3 0 1 0-6 0M15 46a3 3 0 1 0 6 0a3 3 0 1 0-6 0M31 46a3 3 0 1 0 6 0a3 3 0 1 0-6 0M127 46a3 3 0 1 0 6 0a3 3 0 1 0-6 0M143 46a3 3 0 1 0 6 0a3 3 0 1 0-6 0M23 61a3 3 0 1 0 6 0a3 3 0 1 0-6 0M39 61a3 3 0 1 0 6 0a3 3 0 1 0-6 0M119 61a3 3 0 1 0 6 0a3 3 0 1 0-6 0M135 61a3 3 0 1 0 6 0a3 3 0 1 0-6 0M15 76a3 3 0 1 0 6 0a3 3 0 1 0-6 0M31 76a3 3 0 1 0 6 0a3 3 0 1 0-6 0M47 76a3 3 0 1 0 6 0a3 3 0 1 0-6 0M111 76a3 3 0 1 0 6 0a3 3 0 1 0-6 0M127 76a3 3 0 1 0 6 0a3 3 0 1 0-6 0M143 76a3 3 0 1 0 6 0a3 3 0 1 0-6 0"/>
+<circle fill="#FFFFFF" cx="80" cy="45" r="28"/>
+<g stroke-width="3">
+<path fill="#7A2E3A" d="M74.5 33V27L80 22.5L85.5 27V33Z"/>
+</g>
+</g>
+<g fill="#1E1E1E" text-anchor="middle" font-weight="800" font-size="7.5">
+<text x="80" y="46">BARNYARD</text>
+<text x="80" y="56">RESERVE</text>
+</g>
+</svg>

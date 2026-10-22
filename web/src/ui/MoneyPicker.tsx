@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import type { MoneyCard } from "../../../src/rules/types";
 import { view } from "../state";
+import { MoneyNote } from "./MoneyNote";
 
 export type PickerMode = "view" | "pay" | "offer" | "counter";
 
@@ -32,7 +33,7 @@ export function MoneyPicker(props: {
               disabled={mode === "view"}
               aria-pressed={picked.includes(m.id)}
               onClick={() => toggle(m.id)}
-            >{m.value}</button>
+            ><MoneyNote value={m.value} size="chip" /></button>
           ))}
         </div>
         {mode === "pay" && <div class="total">Selected {total} / Owed {owed}</div>}
