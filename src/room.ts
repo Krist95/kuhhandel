@@ -37,7 +37,19 @@ export class GameRoom extends DurableObject<Env> {
     ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));
     void ctx.blockConcurrencyWhile(async () => {
       this.room = (await ctx.storage.get<Room>("room")) ?? null;
+      await this.reconcile(Date.now());
     });
+  }
+
+  /**
+   * After a restart (deploy, runtime update) the old sockets are gone and no webSocketClose arrives for them,
+   * so a seat still marked connected without a live socket is disconnected here. After a hibernation wake every
+   * connected seat still has its socket, so this changes and writes nothing.
+   */
+  private async reconcile(now: number): Promise<void> {
+    const live = new Set(this.ctx.getWebSockets().map((ws) => attachmentOf(ws).token));
+    const stale = (this.room?.players ?? []).filter((p) => p.connected && !live.has(p.token)).map((p) => p.token);
+    for (const token of stale) await this.dispatch({ type: "disconnect", token }, now, null);
   }
 
   async fetch(_request: Request): Promise<Response> {
@@ -67,6 +79,11 @@ export class GameRoom extends DurableObject<Env> {
     if (token === null) return;
     if (this.ctx.getWebSockets().some((other) => other !== ws && attachmentOf(other).token === token)) return;
     await this.dispatch({ type: "disconnect", token }, Date.now(), ws);
+  }
+
+  async webSocketError(ws: WebSocket, _error: unknown): Promise<void> {
+    // An error ends the connection like a close; a later webSocketClose for it is then a no-op disconnect.
+    await this.webSocketClose(ws, 1011, "", false);
   }
 
   private async hello(ws: WebSocket, token: string, now: number): Promise<void> {

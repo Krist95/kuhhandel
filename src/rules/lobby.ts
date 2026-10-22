@@ -96,6 +96,9 @@ export function updateSettings(room: Room, host: Player, i: Extract<Intent, { ty
 export function setConnected(room: Room, token: string, connected: boolean, tx: Tx): void {
   const p = room.players.find((x) => x.token === token);
   if (!p) return;
+  // A repeated disconnect (an error and then a close, or start-up reconciliation and then a late close)
+  // must not move disconnectedAt or nobodySince later.
+  if (!connected && !p.connected) return;
   p.connected = connected;
   if (connected) {
     p.disconnectedAt = null;

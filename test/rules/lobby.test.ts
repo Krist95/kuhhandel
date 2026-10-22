@@ -63,6 +63,13 @@ describe("lobby", () => {
     r = run(r, { type: "connect", token: tok("Anna") }, T0 + 9)!;
     expect([pl(r, "Anna").connected, r.nobodySince]).toEqual([true, null]);
   });
+  it("ignores a repeated disconnect, so the first disconnect time stands", () => {
+    let r = run(lobby(["Anna", "Ben"]), { type: "disconnect", token: tok("Anna") }, T0 + 5)!;
+    r = run(r, { type: "disconnect", token: tok("Ben") }, T0 + 7)!;
+    r = run(r, { type: "disconnect", token: tok("Anna") }, T0 + 50)!; // e.g. webSocketError, then the late webSocketClose
+    r = run(r, { type: "disconnect", token: tok("Ben") }, T0 + 60)!;
+    expect([pl(r, "Anna").disconnectedAt, pl(r, "Ben").disconnectedAt, r.nobodySince]).toEqual([T0 + 5, T0 + 7, T0 + 7]);
+  });
   it("lets only the host close the room", () => {
     expect(outcome(lobby(), by("Anna", { type: "closeRoom" }))).toEqual({ ok: true, state: null, events: [{ kind: "closed", reason: "hostClosed" }] });
     expect(fail(lobby(), by("Ben", { type: "closeRoom" }))).toBe("notHost");
