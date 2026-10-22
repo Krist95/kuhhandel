@@ -1,4 +1,5 @@
 import { ERROR_TEXT, RuleError } from "./errors";
+import { bid, pass } from "./auction";
 import { startGame } from "./setup";
 import { chooseAction } from "./turn";
 import { closeRoom, createRoom, joinRoom, leaveSeat, removePlayer, requireHost, setConnected, updateSettings } from "./lobby";
@@ -69,7 +70,13 @@ function apply(room: Room | null, action: Action, tx: Tx): Room | null {
           chooseAction(room, p, i.action, tx);
           return room;
         case "bid":
+          needPlaying(room);
+          bid(room, p, i.amount, tx);
+          return room;
         case "pass":
+          needPlaying(room);
+          pass(room, p, tx);
+          return room;
         case "auctioneerDecision":
         case "pay":
         case "cowTradeOffer":

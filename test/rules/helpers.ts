@@ -3,7 +3,7 @@ import { herdOf } from "../../src/rules/herd";
 import { beginTurn } from "../../src/rules/turn";
 import type { ErrorCode } from "../../src/rules/errors";
 import { mulberry32 } from "../../src/rules/rng";
-import type { Action, Animal, Herd, Intent, MoneyValue, Outcome, Player, Room, Settings } from "../../src/rules/types";
+import type { Action, Animal, Auction, Herd, Intent, MoneyValue, Outcome, Player, Room, Settings } from "../../src/rules/types";
 
 export const T0 = 1_000_000;
 export const NAMES = ["Anna", "Ben", "Clara"];
@@ -82,4 +82,15 @@ export function cash(room: Room, name: string): number {
 }
 export function count(room: Room, name: string, animal: Animal): number {
   return pl(room, name).herd[animal];
+}
+
+export function auc(room: Room): Auction {
+  const phase = room.game!.phase;
+  if (phase.kind !== "bidding" && phase.kind !== "decision" && phase.kind !== "bluff") throw new Error(`no auction in phase ${phase.kind}`);
+  return phase.auction;
+}
+export function passAll(room: Room, now = T0): Room {
+  let r = room;
+  while (r.game!.phase.kind === "bidding") r = act(r, nameOf(r, r.game!.phase.auction.turnId!), { type: "pass" }, now);
+  return r;
 }
