@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import type { RoomView } from "../../../src/protocol";
 import { secondsLeft } from "../model/clock";
 import { scoreLine } from "../model/reveals";
-import { send } from "../net/socket";
+import { sendOrToast } from "../net/socket";
 import { offset, view } from "../state";
 import { ConfirmDialog } from "./ConfirmDialog";
 
@@ -32,13 +32,13 @@ export function EndScreen(props: { room: RoomView }) {
       {s !== null && <p class="countdown">Room closes in {Math.floor(s / 60)}:{String(s % 60).padStart(2, "0")}</p>}
       {isHost && (
         <div class="row">
-          <button onClick={() => send({ type: "playAgain" })}>Play again</button>
+          <button onClick={() => sendOrToast({ type: "playAgain" })}>Play again</button>
           <button class="danger" onClick={() => setConfirm(true)}>Close room</button>
         </div>
       )}
       {confirm && (
         <ConfirmDialog message="Close the room for everyone?" confirmLabel="Close room"
-          onConfirm={() => send({ type: "closeRoom" })} onCancel={() => setConfirm(false)} />
+          onConfirm={() => sendOrToast({ type: "closeRoom" })} onCancel={() => setConfirm(false)} />
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { formProblems, normalizeRoomId, savePassword, type RoomFormValues } from "../model/lobby";
-import { send } from "../net/socket";
+import { sendOrToast } from "../net/socket";
 import { homeScreen, notice, toast } from "../state";
 
 function store(): Storage | null {
@@ -21,8 +21,8 @@ export function RoomForm(props: { mode: "create" | "join" }) {
     if (p.length > 0 || f.seat === null) return;
     savePassword(store(), f.password);
     const playerName = f.playerName.trim();
-    if (mode === "create") send({ type: "createRoom", roomName: f.roomName.trim(), password: f.password, playerName, seat: f.seat });
-    else send({ type: "joinRoom", roomId: normalizeRoomId(f.roomId), password: f.password, playerName, seat: f.seat });
+    if (mode === "create") sendOrToast({ type: "createRoom", roomName: f.roomName.trim(), password: f.password, playerName, seat: f.seat });
+    else sendOrToast({ type: "joinRoom", roomId: normalizeRoomId(f.roomId), password: f.password, playerName, seat: f.seat });
   };
 
   return (

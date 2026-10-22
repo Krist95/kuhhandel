@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import type { RoomView } from "../../../src/protocol";
 import { DECISION_SECONDS } from "../../../src/rules/types";
 import { lobbySeats, savedPassword, shareText } from "../model/lobby";
-import { send } from "../net/socket";
+import { sendOrToast } from "../net/socket";
 import { toast, view } from "../state";
 import { ConfirmDialog } from "./ConfirmDialog";
 
@@ -67,14 +67,14 @@ export function Lobby(props: { room: RoomView }) {
         <div class="settings">
           <label>Cow trade money
             <select disabled={!isHost} value={room.settings.moneyRule}
-              onChange={(e) => send({ type: "updateSettings", moneyRule: e.currentTarget.value as "swap" | "loserTakesBoth" })}>
+              onChange={(e) => sendOrToast({ type: "updateSettings", moneyRule: e.currentTarget.value as "swap" | "loserTakesBoth" })}>
               <option value="swap">Swap</option>
               <option value="loserTakesBoth">Loser takes both</option>
             </select>
           </label>
           <label>Time per decision
             <select disabled={!isHost} value={room.settings.decisionSeconds}
-              onChange={(e) => send({ type: "updateSettings", decisionSeconds: Number(e.currentTarget.value) })}>
+              onChange={(e) => sendOrToast({ type: "updateSettings", decisionSeconds: Number(e.currentTarget.value) })}>
               {DECISION_SECONDS.map((s) => <option value={s}>{s} s</option>)}
             </select>
           </label>
@@ -83,21 +83,21 @@ export function Lobby(props: { room: RoomView }) {
           {room.players.map((p) => (
             <li>
               <span>{p.name}{p.id === room.hostId ? " (host)" : ""}</span>
-              {isHost && p.id !== me && <button class="danger small" onClick={() => send({ type: "removePlayer", playerId: p.id })}>Remove</button>}
+              {isHost && p.id !== me && <button class="danger small" onClick={() => sendOrToast({ type: "removePlayer", playerId: p.id })}>Remove</button>}
             </li>
           ))}
         </ul>
         {toast.value && <p class="error" onClick={() => { toast.value = null; }}>{toast.value}</p>}
         <div class="row">
-          <button class="secondary" onClick={() => send({ type: "leaveSeat" })}>Leave seat</button>
-          {isHost && <button disabled={!canStart} onClick={() => send({ type: "startGame" })}>Start game</button>}
+          <button class="secondary" onClick={() => sendOrToast({ type: "leaveSeat" })}>Leave seat</button>
+          {isHost && <button disabled={!canStart} onClick={() => sendOrToast({ type: "startGame" })}>Start game</button>}
           {isHost && <button class="danger" onClick={() => setConfirmClose(true)}>Close room</button>}
         </div>
         {isHost && !canStart && <p class="hint">Waiting for 3–5 players</p>}
       </div>
       {confirmClose && (
         <ConfirmDialog message="Close the room for everyone?" confirmLabel="Close room"
-          onConfirm={() => { setConfirmClose(false); send({ type: "closeRoom" }); }} onCancel={() => setConfirmClose(false)} />
+          onConfirm={() => { setConfirmClose(false); sendOrToast({ type: "closeRoom" }); }} onCancel={() => setConfirmClose(false)} />
       )}
     </div>
   );

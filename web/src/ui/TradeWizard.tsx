@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import { ANIMAL_NAME, type Animal, type TradeTerms } from "../../../src/rules/types";
 import type { TradeTarget } from "../model/controls";
-import { send } from "../net/socket";
+import { sendOrToast } from "../net/socket";
 import { view } from "../state";
 import { MoneyPicker } from "./MoneyPicker";
 
@@ -12,7 +12,7 @@ export function TradeWizard(props: { fixed: TradeTerms | null; targets: TradeTar
   const [count, setCount] = useState<1 | 2 | null>(null);
   const word = (a: Animal, n: number) => ANIMAL_NAME[a][n === 1 ? 0 : 1];
   const offer = (terms: TradeTerms) => (cardIds: string[]) => {
-    send({ type: "cowTradeOffer", targetId: terms.defenderId, animal: terms.animal, count: terms.count, cardIds });
+    sendOrToast({ type: "cowTradeOffer", targetId: terms.defenderId, animal: terms.animal, count: terms.count, cardIds });
     props.onClose();
   };
 

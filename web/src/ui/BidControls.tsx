@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { bidStep, canSubmitBid } from "../model/controls";
-import { send } from "../net/socket";
+import { sendOrToast } from "../net/socket";
 
 export function BidControls(props: { topBid: number; minBid: number }) {
   const { minBid } = props;
@@ -15,8 +15,8 @@ export function BidControls(props: { topBid: number; minBid: number }) {
         {([10, 50, 100] as const).map((n) => <button key={n} class="secondary small" onClick={() => raise(n)}>+{n}</button>)}
       </div>
       <div class="row">
-        <button disabled={!canSubmitBid(amount, minBid)} onClick={() => send({ type: "bid", amount })}>Bid</button>
-        <button class="secondary" onClick={() => send({ type: "pass" })}>Pass</button>
+        <button disabled={!canSubmitBid(amount, minBid)} onClick={() => sendOrToast({ type: "bid", amount })}>Bid</button>
+        <button class="secondary" onClick={() => sendOrToast({ type: "pass" })}>Pass</button>
       </div>
     </div>
   );

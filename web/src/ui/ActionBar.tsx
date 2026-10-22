@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { deriveControls, sheetKey, type Controls, type Enabled } from "../model/controls";
-import { send } from "../net/socket";
+import { sendOrToast } from "../net/socket";
 import { view } from "../state";
 import { AwayBanner } from "./AwayBanner";
 import { BidControls } from "./BidControls";
@@ -33,8 +33,8 @@ function ControlView(props: { c: Controls }) {
     case "turn":
       return (
         <div class="action-bar">
-          <Reasoned label="Auction" en={c.auction} onClick={() => send({ type: "chooseAction", action: "auction" })} />
-          <Reasoned label="Cow trade" en={c.cowTrade} onClick={() => send({ type: "chooseAction", action: "cowTrade" })} />
+          <Reasoned label="Auction" en={c.auction} onClick={() => sendOrToast({ type: "chooseAction", action: "auction" })} />
+          <Reasoned label="Cow trade" en={c.cowTrade} onClick={() => sendOrToast({ type: "chooseAction", action: "cowTrade" })} />
         </div>
       );
     case "bid":
@@ -42,16 +42,16 @@ function ControlView(props: { c: Controls }) {
     case "decide":
       return (
         <div class="action-bar">
-          <button onClick={() => send({ type: "auctioneerDecision", decision: "sell" })}>Sell</button>
+          <button onClick={() => sendOrToast({ type: "auctioneerDecision", decision: "sell" })}>Sell</button>
           <Reasoned label="Buy it" en={c.buyEnabled ? { ok: true } : { ok: false, reason: "Can't afford it" }}
-            onClick={() => send({ type: "auctioneerDecision", decision: "buy" })} />
+            onClick={() => sendOrToast({ type: "auctioneerDecision", decision: "buy" })} />
         </div>
       );
     case "pay":
       return (
         <div class="action-bar">
           <button onClick={() => setOpen(true)}>Pay {c.amount}</button>
-          {open && <MoneyPicker mode="pay" owed={c.amount} onSubmit={(cardIds) => { send({ type: "pay", cardIds }); close(); }} onClose={close} />}
+          {open && <MoneyPicker mode="pay" owed={c.amount} onSubmit={(cardIds) => { sendOrToast({ type: "pay", cardIds }); close(); }} onClose={close} />}
         </div>
       );
     case "tradeSetup":
@@ -67,8 +67,8 @@ function ControlView(props: { c: Controls }) {
           <button onClick={() => setOpen(true)}>Respond</button>
           {open && (
             <MoneyPicker mode="counter" note={`Offered ${c.offerCount} ${c.offerCount === 1 ? "card" : "cards"}`}
-              onSubmit={(cardIds) => { send({ type: "cowTradeResponse", cardIds }); close(); }}
-              onNothing={() => { send({ type: "cowTradeResponse", cardIds: [] }); close(); }} onClose={close} />
+              onSubmit={(cardIds) => { sendOrToast({ type: "cowTradeResponse", cardIds }); close(); }}
+              onNothing={() => { sendOrToast({ type: "cowTradeResponse", cardIds: [] }); close(); }} onClose={close} />
           )}
         </div>
       );

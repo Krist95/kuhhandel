@@ -21,11 +21,13 @@ function Screen() {
   }
   if (v === null) return <div class="center">Connecting…</div>;
   if (v.room === null) return homeScreen.value === "home" ? <Home /> : <RoomForm mode={homeScreen.value} />;
+  // The last view stays on screen while the socket is down, so say that it may be stale.
+  const badge = conn.value !== "online" && <div class="conn-badge" role="status">Reconnecting…</div>;
   switch (v.room.status) {
-    case "LOBBY": return <Lobby room={v.room} />;
+    case "LOBBY": return <><Lobby room={v.room} />{badge}</>;
     case "PLAYING":
-    case "PAUSED": return <Table room={v.room} />;
-    case "FINISHED": return <><EndScreen room={v.room} /><Toast /></>;
+    case "PAUSED": return <><Table room={v.room} />{badge}</>;
+    case "FINISHED": return <><EndScreen room={v.room} /><Toast />{badge}</>;
   }
 }
 
