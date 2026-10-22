@@ -1,6 +1,7 @@
 import type { RoomView } from "../../../src/protocol";
 import { seatPositions, type Pos } from "../model/layout";
 import { view } from "../state";
+import { ActionBar } from "./ActionBar";
 import { Center } from "./Center";
 import { MyArea } from "./MyArea";
 import { OpponentPanel } from "./OpponentPanel";
@@ -31,7 +32,7 @@ export function Table(props: { room: RoomView }) {
       <div class="cell c2 r2"><Center room={room} game={game} /></div>
       <div class="cell c3 r2">{at("right")}</div>
       <div class="cell my r3">{me && <MyArea player={me} />}</div>
-      <div class="action-cell cell c3 r3" />
+      <div class="action-cell cell c3 r3"><ActionBar /></div>
     </div>
   );
 }

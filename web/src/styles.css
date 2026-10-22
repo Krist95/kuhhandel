@@ -84,3 +84,15 @@ input, select, textarea { font: inherit; padding: 0.3em 0.6em; border-radius: 0.
 .animal .a-value, .animal .a-count { flex: none; }
 .animal.chip { min-width: 0; max-width: 100%; }
 .chips { min-width: 0; }
+.action-bar, .bid-controls { display: flex; flex-direction: column; gap: 0.25em; align-items: stretch; width: 100%; font-size: 0.85em; }
+.bid-controls input { width: 100%; box-sizing: border-box; min-height: 0; padding: 0.15em 0.4em; }
+.bid-controls .row, .sheet-buttons { display: flex; gap: 0.25em; justify-content: center; }
+.bid-controls button, .action-bar button { min-height: 0; padding: 0.3em 0.5em; }
+.reasoned .hint { font-size: 0.75em; margin: 0; }
+.away-banner { display: flex; flex-direction: column; gap: 0.25em; text-align: center; font-size: 0.85em; }
+.overlay.picker { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); }
+.sheet { background: var(--felt-dark); border: 1px solid var(--muted); border-radius: 0.8em; padding: 0.6em 1em; max-width: 90vw; max-height: 94vh; overflow: hidden; display: flex; flex-direction: column; gap: 0.4em; align-items: center; box-sizing: border-box; }
+.money-cards { display: flex; flex-wrap: wrap; gap: 0.35em; justify-content: center; }
+.money-card { min-width: 3em; padding: 0.3em 0.5em; background: var(--paper); color: var(--ink); border: 2px solid transparent; }
+.money-card.selected { border-color: var(--accent); background: var(--accent); }
+.total { font-weight: 700; }
