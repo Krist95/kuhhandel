@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { nextInGame } from "../../src/rules/turn";
-import { NAMES, act, by, cash, fail, game, idOf, lobby, nameOf, pl, reject, type GameOpts } from "./helpers";
+import { NAMES, T0, act, by, cash, fail, game, idOf, lobby, nameOf, pl, reject, type GameOpts } from "./helpers";
 
 describe("turns", () => {
   const choose = (action: "auction" | "cowTrade") => ({ type: "chooseAction", action }) as const;
+  it("gives each decision two minutes with the 120-second setting", () => {
+    expect(game(NAMES, { settings: { decisionSeconds: 120 } }).game!.deadline).toBe(T0 + 120_000);
+  });
   it("auctions the top card", () => {
     const r = act(game(NAMES, { deck: ["horse", "cow"] }), "Anna", choose("auction"));
     expect([r.game!.phase.kind, r.game!.deck]).toEqual(["bidding", ["cow"]]);

@@ -53,6 +53,7 @@ describe("lobby", () => {
   it("lets only the host change settings, and only to allowed values", () => {
     expect(run(lobby(), by("Anna", { type: "updateSettings", moneyRule: "loserTakesBoth", decisionSeconds: 60 }))!.settings)
       .toEqual({ moneyRule: "loserTakesBoth", decisionSeconds: 60 });
+    expect(run(lobby(), by("Anna", { type: "updateSettings", decisionSeconds: 120 }))!.settings.decisionSeconds).toBe(120);
     expect(fail(lobby(), by("Anna", { type: "updateSettings", decisionSeconds: 15 }))).toBe("invalid");
     expect(fail(lobby(), by("Ben", { type: "updateSettings", decisionSeconds: 30 }))).toBe("notHost");
   });

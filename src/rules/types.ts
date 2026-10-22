@@ -10,7 +10,7 @@ export type MoneyValue = 0 | 10 | 50 | 100 | 200 | 500;
 export const STARTING_MONEY: readonly MoneyValue[] = [0, 0, 10, 10, 10, 10, 50];
 export const DONKEY_PAYOUTS: readonly MoneyValue[] = [50, 100, 200, 500];
 export const ROOM_ID_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-export const DECISION_SECONDS = [10, 20, 30, 60] as const;
+export const DECISION_SECONDS = [10, 20, 30, 60, 120] as const;
 export const HOST_TRANSFER_MS = 120_000, NOBODY_CONNECTED_MS = 600_000, FINISHED_CLOSE_MS = 300_000, BLUFF_REVEAL_MS = 5_000;
 export const AWAY_AFTER = 3, MAX_TIES = 3, LOG_LIMIT = 100, MAX_BID = 100_000;
 
