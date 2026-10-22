@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json"
+    "dev:server": "node -e \"require('fs').mkdirSync('web/dist',{recursive:true})\" && wrangler dev",
+    "test:server": "node -e \"require('fs').mkdirSync('web/dist',{recursive:true})\" && vitest run --config vitest.server.config.ts",
+    "typecheck": "wrangler types && tsc -p tsconfig.json && tsc -p tsconfig.worker.json"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",
