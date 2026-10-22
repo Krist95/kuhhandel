@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { nextInGame } from "../../src/rules/turn";
-import { NAMES, act, by, cash, fail, game, idOf, lobby, nameOf, pl, reject } from "./helpers";
+import { NAMES, act, by, cash, fail, game, idOf, lobby, nameOf, pl, reject, type GameOpts } from "./helpers";
 
 describe("turns", () => {
   const choose = (action: "auction" | "cowTrade") => ({ type: "chooseAction", action }) as const;
@@ -46,5 +46,12 @@ describe("turns", () => {
   it("ends the game when nobody who could trade holds a money card", () => {
     const r = game(NAMES, { deck: [], herds: { Anna: { cow: 2 }, Ben: { cow: 2 }, Clara: { horse: 4 } }, money: { Anna: [], Ben: [] } });
     expect(r.status).toBe("FINISHED");
+  });
+  it("logs the winner, or every name that shares the win", () => {
+    const over = (names: string[], herds: GameOpts["herds"] = {}) => game(names, { deck: [], herds }).log.at(-1)!.text;
+    expect(over(NAMES, { Anna: { horse: 4 } })).toBe("Game over. Anna wins with 1000.");
+    expect(over(NAMES, { Anna: { rooster: 4, donkey: 4 }, Ben: { dog: 4, goat: 4 } })).toBe("Game over. Anna and Ben share the win with 1020.");
+    expect(over(NAMES)).toBe("Game over. Anna, Ben and Clara share the win with 0.");
+    expect(over([...NAMES, "Dan"])).toBe("Game over. Anna, Ben, Clara and Dan share the win with 0.");
   });
 });

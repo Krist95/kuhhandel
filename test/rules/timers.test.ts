@@ -135,4 +135,9 @@ describe("host transfer and closing", () => {
     expect(nextDeadline(act(g(), "Anna", { type: "pause" }))).toBeNull();
     expect(nextDeadline(null)).toBeNull();
   });
+  it("reports a finished room's closing time", () => {
+    const done = game(NAMES, { deck: [], herds: { Anna: { horse: 4 }, Ben: { cow: 4 }, Clara: { cat: 4 } } });
+    expect([done.status, done.finishedAt]).toEqual(["FINISHED", T0]);
+    expect(nextDeadline(done)).toBe(T0 + 300_000);
+  });
 });

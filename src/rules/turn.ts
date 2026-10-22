@@ -92,5 +92,5 @@ export function finishGame(room: Room, tx: Tx): void {
   const score = winners[0].score;
   addLog(room, names.length === 1
     ? `Game over. ${names[0]} wins with ${score}.`
-    : `Game over. ${names.join(" and ")} share the win with ${score}.`);
+    : `Game over. ${names.slice(0, -1).join(", ")} and ${names.at(-1)} share the win with ${score}.`);
 }

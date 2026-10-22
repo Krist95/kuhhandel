@@ -4,7 +4,7 @@ import { addLog, nextClockwise, playerById, type Tx } from "./engine";
 import { RuleError } from "./errors";
 import { closeRoom, requireHost } from "./lobby";
 import { autoPay, settlePayment } from "./payment";
-import { endTurn, inGame, phaseDurationMs, setPhase, waitingOn } from "./turn";
+import { endTurn, inGame, phaseDurationMs, waitingOn } from "./turn";
 import { AWAY_AFTER, FINISHED_CLOSE_MS, HOST_TRANSFER_MS, NOBODY_CONNECTED_MS, type Player, type Room } from "./types";
 
 /** Everything due at tx.now. null = the room closed (event pushed). */
