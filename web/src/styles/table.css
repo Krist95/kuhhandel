@@ -157,7 +157,7 @@
 .kh-seg button:disabled{color:var(--muted);cursor:not-allowed}
 
 /* ---------- Table layout ---------- */
-.kh-table{width:100%;height:100%;display:grid;grid-template-columns:minmax(0,1fr) 248px;grid-template-rows:58px 22px minmax(0,1fr) 100px;gap:6px;padding:8px;background:var(--felt-dark);position:relative;overflow:hidden}
+.kh-table{width:100%;height:100%;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) 248px;grid-template-rows:58px 22px minmax(0,1fr) 100px;gap:6px;padding:8px;background:var(--felt-dark);position:relative;overflow:hidden}
 .kh-table .rail{grid-column:1/-1;display:flex;gap:6px;min-width:0}
 .kh-table .menu{flex:none;width:44px;border-radius:var(--radius-lg);border:0;background:var(--felt-deep);color:var(--paper);font:800 18px/1 var(--font-sans);cursor:pointer;box-shadow:inset 0 0 0 1px var(--line)}
 .kh-table .kh-ticker{grid-column:1;grid-row:2}

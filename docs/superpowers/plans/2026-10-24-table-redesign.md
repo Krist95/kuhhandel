@@ -47,15 +47,15 @@ Also `kuhhandel-spec.md` (game rules, §7 UI). This plan changes §7.3 (see Task
 - Modify: `web/src/main.tsx` (import both stylesheets after `./styles.css`), `web/src/styles.css:1-4` (delete the `:root` block; tokens.css now defines those names with the same values)
 
 **Interfaces:**
-- Produces: `fitTable(viewportW: number, viewportH: number): { scale: number; width: number; height: number }`. Exports `DESIGN_H = 360` and `MIN_W = 700`. All `.kh-*` classes become available globally.
+- Produces: `fitTable(viewportW: number, viewportH: number): { scale: number; width: number; height: number }`. Exports `DESIGN_H = 376` and `MIN_W = 716` (the 780×360 design plus its 8px padding; see the table.css edit 1 below). All `.kh-*` classes become available globally.
 
 - [ ] **Step 1: Write failing tests**
 
 `fit.test.ts`:
 ```ts
-it("fills a 844×390 phone by height", () => expect(fitTable(844, 390)).toEqual({ scale: 390 / 360, width: 844 / (390 / 360), height: 360 }));
-it("fits width on a 667×375 phone", () => expect(fitTable(667, 375)).toEqual({ scale: 667 / 700, width: 700, height: 360 }));
-it("handles a 932×430 phone", () => expect(fitTable(932, 430).height).toBe(360));
+it("fills a 844×390 phone by height", () => expect(fitTable(844, 390)).toEqual({ scale: 390 / 376, width: 844 / (390 / 376), height: 376 }));
+it("fits width on a 667×375 phone", () => expect(fitTable(667, 375)).toEqual({ scale: 667 / 716, width: 716, height: 376 }));
+it("handles a 932×430 phone", () => expect(fitTable(932, 430).height).toBe(376));
 it("handles a 640×320 landscape window", () => { const f = fitTable(640, 320); expect(f.scale * f.height).toBeLessThanOrEqual(320); expect(f.scale * f.width).toBeLessThanOrEqual(640); });
 ```
 `tokens.test.ts`: read `docs/design/kuhhandel-table/tokens.json` and `web/src/styles/tokens.css` with `node:fs`. For every token in `color`, `spacing`, `radius` and `shadow`, assert the css contains `--${name}:${value};`. Also assert it contains `--font-sans:` followed by `type.families.sans`.
@@ -66,7 +66,7 @@ it("handles a 640×320 landscape window", () => { const f = fitTable(640, 320); 
   - `fit.ts`: `scale = Math.min(vh / DESIGN_H, vw / MIN_W)`, `width = vw / scale`, `height = DESIGN_H`.
   - `tokens.css`: one `:root{…}` block in the exact `--name:value;` form the test expects (colours, spacing, radius, shadow, `--font-sans`).
   - `table.css`: a verbatim copy of `components/bundle.css` with exactly three edits:
-    1. `.kh-table{width:780px;height:360px;` → `.kh-table{width:100%;height:100%;`
+    1. `.kh-table{width:780px;height:360px;` → `.kh-table{width:100%;height:100%;box-sizing:border-box;` (the canvas is the design's outer box, padding included: `fit.ts` uses DESIGN_H 376 and MIN_W 716, so the inner grid stays 360px tall as in the design)
     2. Append `.kh-frame{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:var(--felt-dark);overflow:hidden;display:flex;align-items:center;justify-content:center}`
     3. Append `.kh-canvas{flex:none;transform-origin:center}`
 
