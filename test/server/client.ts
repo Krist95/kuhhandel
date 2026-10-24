@@ -94,12 +94,12 @@ export const roomStub = () => env.GAME_ROOM.get(env.GAME_ROOM.idFromName("main")
 
 export async function setupGame(names: string[]): Promise<TestClient[]> {
   const host = await connect();
-  const created = await host.request({ type: "createRoom", roomName: "Barn", password: "pw", playerName: names[0]!, seat: 1 });
+  const created = await host.request({ type: "createRoom", roomName: "Barn", playerName: names[0]!, moneyRule: "swap", decisionSeconds: 20 });
   if (created.type !== "view") throw new Error(`createRoom failed: ${JSON.stringify(created)}`);
   const clients = [host];
-  for (const [i, name] of names.slice(1).entries()) {
+  for (const name of names.slice(1)) {
     const c = await connect();
-    const joined = await c.request({ type: "joinRoom", roomId: host.view.room!.roomId, password: "pw", playerName: name, seat: i + 2 });
+    const joined = await c.request({ type: "joinRoom", roomId: host.view.room!.roomId, playerName: name });
     if (joined.type !== "view") throw new Error(`joinRoom failed for ${name}: ${JSON.stringify(joined)}`);
     clients.push(c);
   }

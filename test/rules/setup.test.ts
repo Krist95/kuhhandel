@@ -24,7 +24,7 @@ describe("startGame", () => {
   it("needs the host and 3–5 players, and locks the room once started", () => {
     expect(fail(lobby(["Anna", "Ben"]), by("Anna", { type: "startGame" }))).toBe("notEnoughPlayers");
     expect(fail(lobby(), by("Ben", { type: "startGame" }))).toBe("notHost");
-    expect(fail(game(), joinAction("Dan", 4))).toBe("gameStarted");
+    expect(fail(game(), joinAction("Dan"))).toBe("gameStarted");
   });
   it("Play again restarts a finished game with the same players and settings", () => {
     const done = game(NAMES, { deck: [], herds: { Anna: { horse: 4 }, Ben: { cow: 4 }, Clara: { cat: 4 } }, settings: { decisionSeconds: 30 } });

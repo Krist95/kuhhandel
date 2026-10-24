@@ -6,10 +6,13 @@ import { registerServiceWorker, tryLockLandscape } from "./device/pwa";
 import { keepAwake } from "./device/wakeLock";
 import { alertKey, shouldAlert } from "./model/alerts";
 import { startConnection } from "./net/socket";
-import { view } from "./state";
+import { homeScreen, view } from "./state";
 import "./styles.css";
 import "./styles/tokens.css";
 import "./styles/table.css";
+
+const joinMatch = /^\/join\/([A-Z0-9]{6})$/i.exec(location.pathname);
+if (joinMatch) homeScreen.value = { join: joinMatch[1]!.toUpperCase() };
 
 render(<App />, document.getElementById("app")!);
 // The dev table scenes (?table) run on fixtures; a live connection would overwrite their view.

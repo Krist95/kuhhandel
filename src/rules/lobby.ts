@@ -2,8 +2,8 @@ import { addLog, nextClockwise, playerById, type Tx } from "./engine";
 import { RuleError } from "./errors";
 import { randomId } from "./rng";
 import {
-  ANIMALS, DECISION_SECONDS, DEFAULT_SETTINGS, ROOM_ID_ALPHABET,
-  type Action, type CloseReason, type Herd, type Intent, type Player, type Room, type Seat,
+  ANIMALS, DECISION_SECONDS, ROOM_ID_ALPHABET,
+  type Action, type CloseReason, type Herd, type Player, type Room, type Seat, type Settings,
 } from "./types";
 
 export function normalizeName(raw: string, max: number): string | null {
@@ -16,10 +16,6 @@ function emptyHerd(): Herd {
   return Object.fromEntries(ANIMALS.map((a) => [a, 0])) as Herd;
 }
 
-function isSeat(n: number): n is Seat {
-  return Number.isInteger(n) && n >= 1 && n <= 5;
-}
-
 function newPlayer(tx: Tx, taken: readonly Player[], token: string, name: string, seat: Seat): Player {
   // reduce may be seeded identically on every call, so keep the ID unique within the room
   let id = randomId(tx.rng);
@@ -30,17 +26,29 @@ function newPlayer(tx: Tx, taken: readonly Player[], token: string, name: string
   };
 }
 
+function validateSettings(moneyRule: unknown, decisionSeconds: unknown): Settings {
+  if (moneyRule !== "swap" && moneyRule !== "loserTakesBoth") throw new RuleError("invalid");
+  if (!(DECISION_SECONDS as readonly unknown[]).includes(decisionSeconds)) throw new RuleError("invalid");
+  return { moneyRule, decisionSeconds: decisionSeconds as Settings["decisionSeconds"] };
+}
+
+function firstOpenSeat(players: readonly Player[]): Seat {
+  const taken = new Set(players.map((p) => p.seat));
+  for (let s = 1; s <= 5; s++) if (!taken.has(s as Seat)) return s as Seat;
+  throw new RuleError("roomFull");
+}
+
 export function createRoom(a: Extract<Action, { type: "create" }>, tx: Tx): Room {
   const roomName = normalizeName(a.roomName, 24);
   if (roomName === null) throw new RuleError("badRoomName");
   const name = normalizeName(a.playerName, 16);
   if (name === null) throw new RuleError("badName");
-  if (!isSeat(a.seat)) throw new RuleError("badSeat");
+  const settings = validateSettings(a.moneyRule, a.decisionSeconds);
   const roomId = randomId(tx.rng, 6, ROOM_ID_ALPHABET);
-  const host = newPlayer(tx, [], a.token, name, a.seat);
+  const host = newPlayer(tx, [], a.token, name, 1);
   const room: Room = {
-    status: "LOBBY", roomId, roomName, passwordHash: a.passwordHash, passwordSalt: a.passwordSalt,
-    hostId: host.id, players: [host], blockedTokens: [], settings: { ...DEFAULT_SETTINGS },
+    status: "LOBBY", roomId, roomName,
+    hostId: host.id, players: [host], blockedTokens: [], settings,
     game: null, scores: null, log: [], logSeq: 0, finishedAt: null, nobodySince: null,
   };
   addLog(room, `${name} created the room.`);
@@ -52,11 +60,10 @@ export function joinRoom(room: Room, a: Extract<Action, { type: "join" }>, tx: T
   if (room.players.some((p) => p.token === a.token)) throw new RuleError("alreadySeated");
   const name = normalizeName(a.playerName, 16);
   if (name === null) throw new RuleError("badName");
-  if (!isSeat(a.seat)) throw new RuleError("badSeat");
   const lower = name.toLowerCase();
   if (room.players.some((p) => p.name.toLowerCase() === lower)) throw new RuleError("nameTaken");
-  if (room.players.some((p) => p.seat === a.seat)) throw new RuleError("seatTaken");
-  room.players.push(newPlayer(tx, room.players, a.token, name, a.seat));
+  const seat = firstOpenSeat(room.players);
+  room.players.push(newPlayer(tx, room.players, a.token, name, seat));
   room.nobodySince = null;
   addLog(room, `${name} joined.`);
 }
@@ -82,15 +89,6 @@ export function removePlayer(room: Room, host: Player, playerId: string, tx: Tx)
   room.blockedTokens.push(target.token);
   tx.events.push({ kind: "removed", token: target.token });
   addLog(room, `${target.name} was removed.`);
-}
-
-export function updateSettings(room: Room, host: Player, i: Extract<Intent, { type: "updateSettings" }>): void {
-  requireHost(room, host);
-  const { moneyRule, decisionSeconds } = i;
-  if (moneyRule !== undefined && moneyRule !== "swap" && moneyRule !== "loserTakesBoth") throw new RuleError("invalid");
-  if (decisionSeconds !== undefined && !(DECISION_SECONDS as readonly number[]).includes(decisionSeconds)) throw new RuleError("invalid");
-  if (moneyRule !== undefined) room.settings.moneyRule = moneyRule;
-  if (decisionSeconds !== undefined) room.settings.decisionSeconds = decisionSeconds as Room["settings"]["decisionSeconds"];
 }
 
 export function setConnected(room: Room, token: string, connected: boolean, tx: Tx): void {

@@ -5,7 +5,7 @@ import { pay } from "./payment";
 import { startGame } from "./setup";
 import { checkHostTransfer, markActive, pause, resume, settleAway, tick } from "./timers";
 import { chooseAction } from "./turn";
-import { closeRoom, createRoom, joinRoom, leaveSeat, removePlayer, requireHost, setConnected, updateSettings } from "./lobby";
+import { closeRoom, createRoom, joinRoom, leaveSeat, removePlayer, requireHost, setConnected } from "./lobby";
 import { LOG_LIMIT, type Action, type Ctx, type Intent, type Outcome, type Player, type Room, type RoomEvent, type Seat } from "./types";
 
 export interface Tx extends Ctx { events: RoomEvent[] }
@@ -28,7 +28,7 @@ function apply(room: Room | null, action: Action, tx: Tx): Room | null {
       if (room) throw new RuleError("roomInUse");
       return createRoom(action, tx);
     case "join":
-      if (!room) throw new RuleError("badCredentials");
+      if (!room) throw new RuleError("roomNotFound");
       if (room.status !== "LOBBY") throw new RuleError("gameStarted");
       joinRoom(room, action, tx);
       return room;
@@ -64,10 +64,6 @@ function applyIntent(room: Room, p: Player, i: Intent, tx: Tx): Room | null {
         case "removePlayer":
           needLobby(room);
           removePlayer(room, p, i.playerId, tx);
-          return room;
-        case "updateSettings":
-          needLobby(room);
-          updateSettings(room, p, i);
           return room;
         case "closeRoom":
           requireHost(room, p);

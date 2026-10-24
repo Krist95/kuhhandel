@@ -18,7 +18,6 @@ export type Seat = 1 | 2 | 3 | 4 | 5;
 export type Herd = Record<Animal, number>;
 export interface MoneyCard { id: string; value: MoneyValue }
 export interface Settings { moneyRule: "swap" | "loserTakesBoth"; decisionSeconds: (typeof DECISION_SECONDS)[number] }
-export const DEFAULT_SETTINGS: Settings = { moneyRule: "swap", decisionSeconds: 20 };
 export interface Player {
   id: string; token: string; name: string; seat: Seat; connected: boolean; disconnectedAt: number | null;
   money: MoneyCard[]; herd: Herd; out: boolean; away: boolean; timeouts: number; // consecutive timeouts
@@ -51,14 +50,13 @@ export interface ScoreRow { playerId: string; sets: Animal[]; setValue: number; 
 export interface LogEntry { seq: number; text: string }
 export type RoomStatus = "LOBBY" | "PLAYING" | "PAUSED" | "FINISHED";
 export interface Room { // the EMPTY state is `null`
-  status: RoomStatus; roomId: string; roomName: string; passwordHash: string; passwordSalt: string;
+  status: RoomStatus; roomId: string; roomName: string;
   hostId: string; players: Player[]; blockedTokens: string[]; settings: Settings;
   game: Game | null; scores: ScoreRow[] | null; log: LogEntry[]; logSeq: number;
   finishedAt: number | null; nobodySince: number | null;
 }
 export type Intent =
   | { type: "leaveSeat" } | { type: "removePlayer"; playerId: string }
-  | { type: "updateSettings"; moneyRule?: Settings["moneyRule"]; decisionSeconds?: number }
   | { type: "startGame" } | { type: "chooseAction"; action: "auction" | "cowTrade" }
   | { type: "bid"; amount: number } | { type: "pass" }
   | { type: "auctioneerDecision"; decision: "sell" | "buy" } | { type: "pay"; cardIds: string[] }
@@ -66,8 +64,8 @@ export type Intent =
   | { type: "cowTradeResponse"; cardIds: string[] }
   | { type: "pause" } | { type: "resume" } | { type: "closeRoom" } | { type: "playAgain" } | { type: "imBack" };
 export type Action =
-  | { type: "create"; token: string; roomName: string; playerName: string; seat: number; passwordHash: string; passwordSalt: string }
-  | { type: "join"; token: string; playerName: string; seat: number }
+  | { type: "create"; token: string; roomName: string; playerName: string; moneyRule: Settings["moneyRule"]; decisionSeconds: Settings["decisionSeconds"] }
+  | { type: "join"; token: string; playerName: string }
   | { type: "connect"; token: string } | { type: "disconnect"; token: string }
   | { type: "intent"; token: string; intent: Intent } | { type: "tick" };
 export type CloseReason = "hostClosed" | "finished" | "inactive";

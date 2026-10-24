@@ -1,16 +1,15 @@
 import { DurableObject } from "cloudflare:workers";
-import { hashPassword, verifyPassword } from "./password";
 import { parseClientMessage, type ClientMessage, type ServerMessage } from "./protocol";
 import { reduce } from "./rules/engine";
 import { ERROR_TEXT, type ErrorCode } from "./rules/errors";
 import { nextDeadline } from "./rules/timers";
-import type { Action, Room } from "./rules/types";
+import type { Action, Room, Settings } from "./rules/types";
 import { buildView } from "./rules/view";
 
-interface Attachment { token: string | null; fails: number[] }  // fails = timestamps of bad-credential joins
+interface Attachment { token: string | null; fails: number[] }  // fails = timestamps of bad-room-id joins
 
 const TOKEN_PATTERN = /^[0-9a-f-]{36}$/i;
-const FAIL_WINDOW_MS = 60_000, MAX_FAILS = 5, MAX_PASSWORD = 64;
+const FAIL_WINDOW_MS = 60_000, MAX_FAILS = 5;
 
 export function cryptoRng(): () => number {
   return () => crypto.getRandomValues(new Uint32Array(1))[0]! / 2 ** 32;
@@ -106,35 +105,27 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   private async createRoom(ws: WebSocket, token: string, msg: Extract<ClientMessage, { type: "createRoom" }>, now: number): Promise<void> {
-    const length = [...msg.password].length;
-    if (length < 1 || length > MAX_PASSWORD) return sendError(ws, "badPassword");
     if (this.room) return sendError(ws, "roomInUse");
-    const { hash, salt } = await hashPassword(msg.password);
-    await this.dispatch({ type: "create", token, roomName: msg.roomName, playerName: msg.playerName, seat: msg.seat,
-      passwordHash: hash, passwordSalt: salt }, now, ws);
+    // decisionSeconds is untrusted input (plain `number` on the wire); createRoom validates it against DECISION_SECONDS at runtime.
+    await this.dispatch({ type: "create", token, roomName: msg.roomName, playerName: msg.playerName,
+      moneyRule: msg.moneyRule, decisionSeconds: msg.decisionSeconds as Settings["decisionSeconds"] }, now, ws);
   }
 
   private async joinRoom(ws: WebSocket, token: string, msg: Extract<ClientMessage, { type: "joinRoom" }>, now: number): Promise<void> {
-    const att = attachmentOf(ws);
-    att.fails = att.fails.filter((t) => now - t < FAIL_WINDOW_MS);
-    if (att.fails.length >= MAX_FAILS) {
-      ws.serializeAttachment(att);
-      return sendError(ws, "tooManyAttempts");
-    }
-    // Count the attempt before the slow hash, so joins sent back to back can't all pass the check above.
-    // A correct password refunds it below.
-    att.fails.push(now);
-    ws.serializeAttachment(att);
     const room = this.room;
-    const ok = room !== null && msg.roomId.trim().toUpperCase() === room.roomId
-      && await verifyPassword(msg.password, room.passwordHash, room.passwordSalt);
-    if (!ok) return sendError(ws, "badCredentials");
-    const after = attachmentOf(ws); // re-read: other messages on this socket may have changed it during the await
-    const i = after.fails.indexOf(now);
-    if (i >= 0) after.fails.splice(i, 1);
-    ws.serializeAttachment(after);
-    if (this.room?.passwordHash !== room.passwordHash) return sendError(ws, "badCredentials");
-    await this.dispatch({ type: "join", token, playerName: msg.playerName, seat: msg.seat }, now, ws);
+    if (room === null || msg.roomId.trim().toUpperCase() !== room.roomId) {
+      const att = attachmentOf(ws);
+      att.fails = att.fails.filter((t) => now - t < FAIL_WINDOW_MS);
+      if (att.fails.length >= MAX_FAILS) {
+        ws.serializeAttachment(att);
+        return sendError(ws, "tooManyAttempts");
+      }
+      att.fails.push(now);
+      ws.serializeAttachment(att);
+      return sendError(ws, "roomNotFound");
+    }
+    if (room.status !== "LOBBY") return sendError(ws, "gameStarted");
+    await this.dispatch({ type: "join", token, playerName: msg.playerName }, now, ws);
   }
 
   async alarm(): Promise<void> {
