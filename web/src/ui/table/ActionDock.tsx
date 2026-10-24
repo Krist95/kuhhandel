@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { ComponentChildren } from "preact";
-import type { RoomView } from "../../../../src/protocol";
+import type { ClientMessage, RoomView } from "../../../../src/protocol";
 import { autoPay } from "../../../../src/rules/payment";
 import { ANIMAL_NAME, type Animal, type MoneyCard, type TradeTerms } from "../../../../src/rules/types";
 import { bidStep, canSubmitBid, deriveControls, sheetKey, type Controls } from "../../model/controls";
@@ -26,6 +26,8 @@ export function dockHandMode(c: Controls): "view" | "pay" | "offer" | "counter" 
 const animals = (a: Animal, n: number): string => (n === 1 ? ANIMAL_NAME[a][0] : `${n} ${ANIMAL_NAME[a][1]}`);
 
 interface Ctx { room: RoomView; meId: string; money: readonly MoneyCard[]; nameOf: (id: string) => string; ring: (lg?: boolean) => ComponentChildren }
+/** Ctx plus the dock's one-shot send: after a successful send the decision buttons stay disabled until the next decision remounts DockBody. */
+interface DCtx extends Ctx { sent: boolean; send: (msg: ClientMessage) => void }
 
 function Head(props: { ring: ComponentChildren; h: string; s: string }) {
   return (
@@ -65,7 +67,13 @@ export function ActionDock(props: { room: RoomView; meId: string }) {
 }
 
 function DockBody(props: { c: Controls; ctx: Ctx }) {
-  const { c, ctx } = props;
+  const { c } = props;
+  const [sent, setSent] = useState(false);
+  const ctx: DCtx = {
+    ...props.ctx,
+    sent,
+    send: (msg) => { if (!sent && sendOrToast(msg)) setSent(true); },
+  };
   switch (c.kind) {
     case "away": return <div class="kh-dock"><AwayBanner /></div>;
     case "watch": return <Watch waitingOnId={c.waitingOnId} ctx={ctx} />;
@@ -106,17 +114,17 @@ function Watch(props: { waitingOnId: string | null; ctx: Ctx }) {
   );
 }
 
-function Turn(props: { c: Extract<Controls, { kind: "turn" }>; ctx: Ctx }) {
+function Turn(props: { c: Extract<Controls, { kind: "turn" }>; ctx: DCtx }) {
   const { c, ctx } = props;
   const deck = ctx.room.game?.deckCount ?? 0;
   return (
     <div class="kh-dock mine">
       <Head ring={ctx.ring(true)} h="Your turn" s={deck === 0 ? "Timeout = skip turn" : "Timeout = auction"} />
       <div class="push">
-        <button class="kh-btn big" disabled={!c.auction.ok} onClick={() => sendOrToast({ type: "chooseAction", action: "auction" })}>
+        <button class="kh-btn big" disabled={!c.auction.ok || ctx.sent} onClick={() => ctx.send({ type: "chooseAction", action: "auction" })}>
           Auction<small>{c.auction.ok ? `Flip the top card · ${deck} left` : c.auction.reason}</small>
         </button>
-        <button class="kh-btn big secondary" disabled={!c.cowTrade.ok} onClick={() => sendOrToast({ type: "chooseAction", action: "cowTrade" })}>
+        <button class="kh-btn big secondary" disabled={!c.cowTrade.ok || ctx.sent} onClick={() => ctx.send({ type: "chooseAction", action: "cowTrade" })}>
           Cow trade<small>{c.cowTrade.ok ? "Challenge someone for an animal" : c.cowTrade.reason}</small>
         </button>
       </div>
@@ -124,7 +132,7 @@ function Turn(props: { c: Extract<Controls, { kind: "turn" }>; ctx: Ctx }) {
   );
 }
 
-function Bid(props: { c: Extract<Controls, { kind: "bid" }>; ctx: Ctx }) {
+function Bid(props: { c: Extract<Controls, { kind: "bid" }>; ctx: DCtx }) {
   const { c, ctx } = props;
   const [amount, setAmount] = useState(c.minBid);
   const [sheet, setSheet] = useState(false);
@@ -153,8 +161,8 @@ function Bid(props: { c: Extract<Controls, { kind: "bid" }>; ctx: Ctx }) {
           ))}
         </div>
         <div class="kh-two">
-          <button class="kh-btn secondary" onClick={() => sendOrToast({ type: "pass" })}>Pass</button>
-          <button class="kh-btn" disabled={!canSubmitBid(amount, c.minBid)} onClick={() => sendOrToast({ type: "bid", amount })}>Bid {amount}</button>
+          <button class="kh-btn secondary" disabled={ctx.sent} onClick={() => ctx.send({ type: "pass" })}>Pass</button>
+          <button class="kh-btn" disabled={!canSubmitBid(amount, c.minBid) || ctx.sent} onClick={() => ctx.send({ type: "bid", amount })}>Bid {amount}</button>
         </div>
       </div>
       {sheet && (
@@ -165,17 +173,17 @@ function Bid(props: { c: Extract<Controls, { kind: "bid" }>; ctx: Ctx }) {
   );
 }
 
-function Decide(props: { c: Extract<Controls, { kind: "decide" }>; ctx: Ctx }) {
+function Decide(props: { c: Extract<Controls, { kind: "decide" }>; ctx: DCtx }) {
   const { c, ctx } = props;
   const name = ctx.nameOf(c.topBidderId);
   return (
     <div class="kh-dock mine">
       <Head ring={ctx.ring()} h={`${name} bid ${c.topBid}`} s="Timeout = sell" />
       <div class="push">
-        <button class="kh-btn big" onClick={() => sendOrToast({ type: "auctioneerDecision", decision: "sell" })}>
+        <button class="kh-btn big" disabled={ctx.sent} onClick={() => ctx.send({ type: "auctioneerDecision", decision: "sell" })}>
           Sell<small>{`${name} pays you ${c.topBid}`}</small>
         </button>
-        <button class="kh-btn big secondary" disabled={!c.buyEnabled} onClick={() => sendOrToast({ type: "auctioneerDecision", decision: "buy" })}>
+        <button class="kh-btn big secondary" disabled={!c.buyEnabled || ctx.sent} onClick={() => ctx.send({ type: "auctioneerDecision", decision: "buy" })}>
           Buy it<small>{c.buyEnabled ? `You pay ${name} ${c.topBid}` : `You can’t cover ${c.topBid}`}</small>
         </button>
       </div>
@@ -183,7 +191,7 @@ function Decide(props: { c: Extract<Controls, { kind: "decide" }>; ctx: Ctx }) {
   );
 }
 
-function Pay(props: { c: Extract<Controls, { kind: "pay" }>; ctx: Ctx }) {
+function Pay(props: { c: Extract<Controls, { kind: "pay" }>; ctx: DCtx }) {
   const { c, ctx } = props;
   const owed = c.amount;
   const { ids, sum } = selection(ctx.money);
@@ -205,14 +213,14 @@ function Pay(props: { c: Extract<Controls, { kind: "pay" }>; ctx: Ctx }) {
         <div class="kh-hint">{payHint(sum, owed)}</div>
         <div class="kh-two">
           <button class="kh-btn secondary" onClick={bestFit}>Best fit</button>
-          <button class="kh-btn" disabled={!done} onClick={() => sendOrToast({ type: "pay", cardIds: ids })}>Pay {sum}</button>
+          <button class="kh-btn" disabled={!done || ctx.sent} onClick={() => ctx.send({ type: "pay", cardIds: ids })}>Pay {sum}</button>
         </div>
       </div>
     </div>
   );
 }
 
-function Setup(props: { c: Extract<Controls, { kind: "tradeSetup" }>; ctx: Ctx }) {
+function Setup(props: { c: Extract<Controls, { kind: "tradeSetup" }>; ctx: DCtx }) {
   const { c, ctx } = props;
   const [choice, setChoice] = useState<{ row: number; count: 1 | 2 } | null>(null);
   const opts = tradeOptions(c.targets);
@@ -223,13 +231,15 @@ function Setup(props: { c: Extract<Controls, { kind: "tradeSetup" }>; ctx: Ctx }
   const canOffer = terms !== null && ids.length >= 1;
   const offer = () => {
     if (!terms) return;
-    sendOrToast({ type: "cowTradeOffer", targetId: terms.defenderId, animal: terms.animal, count: terms.count, cardIds: ids });
+    ctx.send({ type: "cowTradeOffer", targetId: terms.defenderId, animal: terms.animal, count: terms.count, cardIds: ids });
   };
   return (
     <div class="kh-dock mine">
-      <Head ring={ctx.ring()} h="Cow trade" s="Pick a rival and an animal" />
+      <Head ring={ctx.ring()} h="Cow trade" s={c.fixed
+        ? `Repeat round · ${c.fixed.count} ${ANIMAL_NAME[c.fixed.animal][c.fixed.count === 1 ? 0 : 1]} with ${ctx.nameOf(c.fixed.defenderId)}`
+        : "Pick a rival and an animal"} />
       {!c.fixed && (
-        <div class="kh-col" style="gap:5px">
+        <div class="kh-col" style="gap:5px;flex:1 1 auto;min-height:0;overflow-y:auto">
           {opts.map((o, i) => {
             const on = choice?.row === i;
             return (
@@ -248,21 +258,17 @@ function Setup(props: { c: Extract<Controls, { kind: "tradeSetup" }>; ctx: Ctx }
         </div>
       )}
       <div class="push">
-        <div class="kh-hint">
-          {c.fixed
-            ? `Repeat round: ${c.fixed.count} ${ANIMAL_NAME[c.fixed.animal][c.fixed.count === 1 ? 0 : 1]} with ${ctx.nameOf(c.fixed.defenderId)}`
-            : "Then pick face-down notes in your hand. Zeros welcome."}
-        </div>
+        <div class="kh-hint">Then pick face-down notes in your hand. Zeros welcome.</div>
         <div class="kh-two">
           <button class="kh-btn secondary" onClick={() => { setChoice(null); picked.value = []; }}>Cancel</button>
-          <button class="kh-btn" disabled={!canOffer} onClick={offer}>Offer {ids.length}</button>
+          <button class="kh-btn" disabled={!canOffer || ctx.sent} onClick={offer}>Offer {ids.length}</button>
         </div>
       </div>
     </div>
   );
 }
 
-function Respond(props: { c: Extract<Controls, { kind: "respond" }>; ctx: Ctx }) {
+function Respond(props: { c: Extract<Controls, { kind: "respond" }>; ctx: DCtx }) {
   const { c, ctx } = props;
   const who = ctx.nameOf(c.challengerId);
   const { ids, sum } = selection(ctx.money);
@@ -273,8 +279,8 @@ function Respond(props: { c: Extract<Controls, { kind: "respond" }>; ctx: Ctx })
       <div class="push">
         <div class="kh-hint">{`Counter with notes from your hand, or fold and pocket their ${cards}.`}</div>
         <div class="kh-two">
-          <button class="kh-btn secondary" onClick={() => sendOrToast({ type: "cowTradeResponse", cardIds: [] })}>Put nothing</button>
-          <button class="kh-btn" disabled={ids.length === 0} onClick={() => sendOrToast({ type: "cowTradeResponse", cardIds: ids })}>Counter {sum}</button>
+          <button class="kh-btn secondary" disabled={ctx.sent} onClick={() => ctx.send({ type: "cowTradeResponse", cardIds: [] })}>Put nothing</button>
+          <button class="kh-btn" disabled={ids.length === 0 || ctx.sent} onClick={() => ctx.send({ type: "cowTradeResponse", cardIds: ids })}>Counter {sum}</button>
         </div>
       </div>
     </div>

@@ -217,3 +217,15 @@
 .kh-board .cell.left{background:transparent;color:var(--muted);font-weight:700;height:24px}
 .kh-frame{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:var(--felt-dark);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .kh-canvas{flex:none;transform-origin:center}
+
+/* ---------- Overflow fixes (added after the copied bundle) ---------- */
+/* Cow-trade options: long names truncate; many options scroll so Cancel / Offer stay pinned. */
+.kh-dock .kh-opt{flex:none}
+.kh-opt .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Hand notes: overlap to fit (Hand sets --ov); the total never gets squeezed out. */
+.kh-hand .notes{display:flex;gap:4px;align-items:flex-end;flex:1;min-width:0}
+.kh-hand .notes>.kh-noteb+.kh-noteb{margin-left:calc(0px - var(--ov,0px))}
+.kh-hand .notes>.kh-noteb[aria-pressed=true]{position:relative;z-index:1}
+/* Still too many at 22px visible each: scroll sideways, with room for the lift and ring. */
+.kh-hand .notes.scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:10px 3px 0;margin:-10px -3px 0}
+.kh-hand .notes.scroll::-webkit-scrollbar{display:none}

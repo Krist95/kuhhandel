@@ -70,6 +70,15 @@ function long(now: number): View {
   });
 }
 
+/** You owe 160 holding 14 notes: the hand row must overlap them and keep the total visible. */
+function bighand(now: number): View {
+  return scene(now, {
+    me: { herd: [["horse", 2], ["sheep", 1], ["donkey", 1]], money: [0, 0, 0, 10, 10, 10, 10, 50, 50, 100, 100, 200, 200, 500] },
+    opps: MID(), deck: 18, donkeys: 2, active: "ben",
+    phase: { kind: "payment", card: "pig", payerId: "me", receiverId: "ben", amount: 160 }, secs: 9, log: ["Ben sold you the Pig for 160"],
+  });
+}
+
 export function buildScenes(now: number): Record<string, View> {
   return {
     intro: scene(now, {
@@ -116,6 +125,19 @@ export function buildScenes(now: number): Record<string, View> {
       phase: { kind: "action", playerId: "anna" }, secs: 9, log: ["Anna is choosing an action"],
     }),
     long: long(now),
+    manyoptions: scene(now, {
+      me: { herd: [["horse", 2], ["sheep", 2], ["pig", 1], ["goose", 1], ["cow", 1], ["dog", 1]], money: [0, 0, 10, 50, 100, 200] },
+      opps: [
+        { name: "Annabelle Strand", herd: [["goose", 2], ["pig", 1]], money: 6 },
+        { name: "Ben", herd: [["horse", 1], ["cow", 2]], money: 9 },
+        { name: "Clara", herd: [["sheep", 2], ["dog", 1]], money: 5 },
+        { name: "Dan", herd: [["pig", 2], ["horse", 1]], money: 8 },
+      ],
+      deck: 0, donkeys: 4, active: "me",
+      phase: { kind: "tradeSetup", challengerId: "me", terms: null, ties: 0 }, secs: 15, log: ["You chose a cow trade"],
+    }),
+    bighand: bighand(now),
+    bighandsmall: bighand(now),
   };
 }
 
