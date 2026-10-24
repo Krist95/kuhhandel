@@ -41,7 +41,7 @@ function firstOpenSeat(players: readonly Player[]): Seat {
 export function createRoom(a: Extract<Action, { type: "create" }>, tx: Tx): Room {
   const roomName = normalizeName(a.roomName, 24);
   if (roomName === null) throw new RuleError("badRoomName");
-  const name = normalizeName(a.playerName, 16);
+  const name = normalizeName(a.playerName, 24);
   if (name === null) throw new RuleError("badName");
   // The DO that owns this room already named it (a.roomId); draw the same number of rng calls as
   // the old random-roomId path did, so an unrelated draw count change doesn't ripple into card/seat dealing.
@@ -65,7 +65,7 @@ export function updateSettings(room: Room, patch: { moneyRule?: Settings["moneyR
 export function joinRoom(room: Room, a: Extract<Action, { type: "join" }>, tx: Tx): void {
   if (room.blockedTokens.includes(a.token)) throw new RuleError("blocked");
   if (room.players.some((p) => p.token === a.token)) throw new RuleError("alreadySeated");
-  const name = normalizeName(a.playerName, 16);
+  const name = normalizeName(a.playerName, 24);
   if (name === null) throw new RuleError("badName");
   const lower = name.toLowerCase();
   if (room.players.some((p) => p.name.toLowerCase() === lower)) throw new RuleError("nameTaken");

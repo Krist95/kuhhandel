@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { PublicPlayer } from "../../../src/protocol";
 import { ERROR_TEXT } from "../../../src/rules/errors";
-import { formProblems, lobbySeats, normalizeRoomId, shareText } from "./lobby";
+import { formProblems, lobbySeats, nameProblem, normalizeRoomId, shareText } from "./lobby";
 
 describe("lobby model", () => {
   it("normalizes room IDs", () => expect(normalizeRoomId(" abc-23x ")).toBe("ABC23X"));
@@ -15,6 +15,10 @@ describe("lobby model", () => {
     expect(text).toContain("https://x.test/join/ABC123");
     expect(text).toContain("ABC123");
     expect(text).not.toContain("Password");
+  });
+  it("allows names up to 24 characters and rejects 25", () => {
+    expect(nameProblem("x".repeat(24))).toBeNull();
+    expect(nameProblem("x".repeat(25))).toBe(ERROR_TEXT.badName);
   });
   it("places players by seat", () =>
     expect(lobbySeats([{ seat: 3 }, { seat: 1 }] as PublicPlayer[]).map((p) => p?.seat ?? null)).toEqual([1, null, 3, null, null]));

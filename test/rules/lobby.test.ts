@@ -36,9 +36,9 @@ describe("lobby", () => {
   it("rejects a token that already has a seat", () => {
     expect(fail(lobby(["Anna", "Ben"]), joinAction("Ben"))).toBe("alreadySeated");
   });
-  it("enforces 1–16 character names counted in code points", () => {
-    for (const bad of ["", "   ", "x".repeat(17)]) expect(fail(lobby(["Anna"]), joinAction(bad))).toBe("badName");
-    expect(run(lobby(["Anna"]), joinAction("🐄".repeat(16)))).not.toBeNull();
+  it("enforces 1-24 character names counted in code points", () => {
+    for (const bad of ["", "   ", "x".repeat(25)]) expect(fail(lobby(["Anna"]), joinAction(bad))).toBe("badName");
+    expect(run(lobby(["Anna"]), joinAction("🐄".repeat(24)))).not.toBeNull();
   });
   it("assigns the first open seat, ascending", () => {
     const r = run(lobby(["Anna", "Ben"]), joinAction("Clara"))!;

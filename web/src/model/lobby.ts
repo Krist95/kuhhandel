@@ -13,12 +13,12 @@ export function normalizeRoomId(input: string): string {
 export function formProblems(f: RoomFormValues, mode: "create"): string[] {
   const out: string[] = [];
   if (mode === "create" && !within(f.roomName.trim(), 1, 24)) out.push(ERROR_TEXT.badRoomName);
-  if (!within(f.playerName.trim(), 1, 16)) out.push(ERROR_TEXT.badName);
+  if (!within(f.playerName.trim(), 1, 24)) out.push(ERROR_TEXT.badName);
   return out;
 }
 
 export function nameProblem(playerName: string): string | null {
-  return within(playerName.trim(), 1, 16) ? null : ERROR_TEXT.badName;
+  return within(playerName.trim(), 1, 24) ? null : ERROR_TEXT.badName;
 }
 
 export function shareText(roomId: string, url: string): string {

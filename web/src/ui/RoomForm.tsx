@@ -23,7 +23,7 @@ export function RoomForm() {
       <h2>Create room</h2>
       <div class="fields">
         <input placeholder="Room name" value={f.roomName} maxLength={24} onInput={(e) => set({ roomName: e.currentTarget.value })} />
-        <input placeholder="Your name" value={f.playerName} onInput={(e) => set({ playerName: e.currentTarget.value })} />
+        <input placeholder="Your name" value={f.playerName} maxLength={24} onInput={(e) => set({ playerName: e.currentTarget.value })} />
       </div>
       <div class="row">
         <label>Cow trade money
