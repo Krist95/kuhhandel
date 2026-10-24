@@ -20,3 +20,7 @@ export function Backs(props: { count: number }) {
     </span>
   );
 }
+
+export function CardBack() {
+  return <img class="kh-note sm" src={CARD_BACK} alt="face-down card" />;
+}
