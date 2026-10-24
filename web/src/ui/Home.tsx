@@ -1,3 +1,5 @@
+import { newRoomId } from "../net/roomId";
+import { startConnection } from "../net/socket";
 import { homeScreen, notice, toast } from "../state";
 
 export function Home() {
@@ -11,7 +13,7 @@ export function Home() {
         </p>
       )}
       <div class="row">
-        <button onClick={() => { toast.value = null; homeScreen.value = "create"; }}>Create room</button>
+        <button onClick={() => { toast.value = null; startConnection(newRoomId()); homeScreen.value = "create"; }}>Create room</button>
         <button onClick={() => { toast.value = null; homeScreen.value = "join"; }}>Join room</button>
       </div>
     </div>

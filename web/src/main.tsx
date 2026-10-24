@@ -5,7 +5,7 @@ import { playTurnAlert, unlockAudio } from "./device/alert";
 import { registerServiceWorker, tryLockLandscape } from "./device/pwa";
 import { keepAwake } from "./device/wakeLock";
 import { alertKey, shouldAlert } from "./model/alerts";
-import { newRoomId } from "./net/roomId";
+import { clearRoomId, loadRoomId, saveRoomId } from "./net/roomSession";
 import { startConnection } from "./net/socket";
 import { homeScreen, view } from "./state";
 import "./styles.css";
@@ -13,14 +13,29 @@ import "./styles/tokens.css";
 import "./styles/table.css";
 
 const joinMatch = /^\/join\/([A-Z0-9]{6})$/i.exec(location.pathname);
-if (joinMatch) homeScreen.value = { join: joinMatch[1]!.toUpperCase() };
-// A join link already names its room; otherwise generate a fresh one up front so a later "Create room"
-// lands in its own Durable Object rather than colliding with whatever anyone else is creating right now.
-const roomId = joinMatch ? joinMatch[1]!.toUpperCase() : newRoomId();
+const storage = (): Storage | null => { try { return localStorage; } catch { return null; } };
 
 render(<App />, document.getElementById("app")!);
 // The dev table scenes (?table) run on fixtures; a live connection would overwrite their view.
-if (!(import.meta.env.DEV && new URLSearchParams(location.search).has("table"))) startConnection(roomId);
+if (!(import.meta.env.DEV && new URLSearchParams(location.search).has("table"))) {
+  if (joinMatch) {
+    const roomId = joinMatch[1]!.toUpperCase();
+    homeScreen.value = { join: roomId };
+    startConnection(roomId);
+  } else {
+    const saved = loadRoomId(storage());
+    if (saved) startConnection(saved);
+    // else: no target yet — conn stays "idle", Screen() shows Home until Create/Join picks a room.
+  }
+}
+
+let lastRoomId: string | null = null;
+effect(() => {
+  const roomId = view.value?.room?.roomId ?? null;
+  if (roomId === lastRoomId) return;
+  lastRoomId = roomId;
+  if (roomId) saveRoomId(storage(), roomId); else clearRoomId(storage());
+});
 
 let prevKey: string | null = null;
 effect(() => {

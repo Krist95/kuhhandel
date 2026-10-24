@@ -12,8 +12,15 @@ import { Table } from "./ui/Table";
 import { RoomForm } from "./ui/RoomForm";
 import { RotateOverlay } from "./ui/RotateOverlay";
 
+function PreRoomScreen() {
+  const screen = homeScreen.value;
+  if (screen === "home") return <Home />;
+  if (screen === "create") return <RoomForm />;
+  if (screen === "join") return <JoinRoom />;
+  return <JoinLink roomId={screen.join} />;
+}
+
 function Screen() {
-  const v = view.value;
   if (conn.value === "replaced") {
     return (
       <div class="center">
@@ -22,14 +29,11 @@ function Screen() {
       </div>
     );
   }
+  // No target yet (no join link, no saved room): nothing is connecting, so offer Create/Join.
+  if (conn.value === "idle") return <PreRoomScreen />;
+  const v = view.value;
   if (v === null) return <div class="center">Connecting…</div>;
-  if (v.room === null) {
-    const screen = homeScreen.value;
-    if (screen === "home") return <Home />;
-    if (screen === "create") return <RoomForm />;
-    if (screen === "join") return <JoinRoom />;
-    return <JoinLink roomId={screen.join} />;
-  }
+  if (v.room === null) return <PreRoomScreen />;
   // The last view stays on screen while the socket is down, so say that it may be stale.
   const badge = conn.value !== "online" && <div class="conn-badge" role="status">Reconnecting…</div>;
   switch (v.room.status) {

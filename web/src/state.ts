@@ -5,7 +5,7 @@ import type { MoneyCard } from "../../src/rules/types";
 import { clockOffset } from "./model/clock";
 
 export const view = signal<View | null>(null);
-export const conn = signal<"connecting" | "online" | "offline" | "replaced">("connecting");
+export const conn = signal<"idle" | "connecting" | "online" | "offline" | "replaced">("idle");
 export const notice = signal<string | null>(null);
 export const toast = signal<string | null>(null);
 /** The error code of the most recent server error, so a screen can tell a terminal failure from a retryable one. */
