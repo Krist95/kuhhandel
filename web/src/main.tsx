@@ -27,15 +27,19 @@ if (!(import.meta.env.DEV && new URLSearchParams(location.search).has("table")))
     if (saved) startConnection(saved);
     // else: no target yet — conn stays "idle", Screen() shows Home until Create/Join picks a room.
   }
-}
 
-let lastRoomId: string | null = null;
-effect(() => {
-  const roomId = view.value?.room?.roomId ?? null;
-  if (roomId === lastRoomId) return;
-  lastRoomId = roomId;
-  if (roomId) saveRoomId(storage(), roomId); else clearRoomId(storage());
-});
+  // Remember the room this player is in, so a reload rejoins it. `undefined` means no view has arrived yet,
+  // so the first view with no room (e.g. the saved room died while away) still clears the stale id.
+  let lastRoomId: string | null | undefined = undefined;
+  effect(() => {
+    const v = view.value;
+    if (v === null) return;
+    const roomId = v.room?.roomId ?? null;
+    if (roomId === lastRoomId) return;
+    lastRoomId = roomId;
+    if (roomId) saveRoomId(storage(), roomId); else clearRoomId(storage());
+  });
+}
 
 let prevKey: string | null = null;
 effect(() => {
