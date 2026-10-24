@@ -282,19 +282,13 @@ Every decision uses the same **Time per decision** setting.
 
 ### 7.3 Game table (poker-style)
 
-Every player sees **themselves at the bottom**. Others are placed clockwise in seat order:
-
-| Players | Positions (clockwise from you) |
-|---|---|
-| 3 | bottom (you), top-left, top-right |
-| 4 | bottom (you), left, top, right |
-| 5 | bottom (you), left, top-left, top-right, right |
+Every player sees **themselves at the bottom**. Opponents sit in one row along the top, clockwise from the player after you.
 
 **Opponent panel (compact):**
 - Name, host marker, turn marker, Away / Out / disconnected indicator.
 - Number of money cards (never values).
-- Animals as small cards with counts, e.g. "Cow ×2"; completed sets highlighted.
-- Tapping the animals or the panel opens a **modal** with the full collection as larger cards, grouped by type, completed sets marked. Tap outside to close.
+- A ten-column herd ledger that fits every possible herd: always ten columns in value order (Rooster → Horse), so position names the animal and colour confirms it. Each column is four stacked pips; filled pips in the animal's colour show how many they hold, and a complete set gets a gold ring. Animals they don't own leave a faint baseline pip, so columns line up across all opponents.
+- Tapping an opponent opens the **herd board**: every herd side by side (that opponent's row outlined), what is left in the deck, and which animals you can cow-trade. Tapping your own animals opens it too. Close returns to the table.
 
 **Center of the table:**
 - Deck with cards remaining.
@@ -306,7 +300,7 @@ Every player sees **themselves at the bottom**. Others are placed clockwise in s
 
 **Your area (bottom):**
 - Your animals in one row (same small cards with counts).
-- Compact money summary (e.g. "10×4 · 50×1 · Total 90"). Tapping opens the full money view, which is also the card picker for offers and payments.
+- Your money notes, always visible; tap to pick them for payments and offers.
 - Contextual action buttons:
   - Your turn: **Auction**, **Cow trade** (disabled with a reason when not possible).
   - Bid turn: quick raises **+10 / +50 / +100**, a field for any amount (multiples of 10), **Bid**, **Pass**.
@@ -320,7 +314,7 @@ Every player sees **themselves at the bottom**. Others are placed clockwise in s
 - **Bluff reveal overlay:** the bluffer's money cards shown to everyone for 5 seconds.
 - **Cow trade reveal modal:** shown only to the two players involved, with both offers and the result.
 - **Pause overlay:** greyed screen, modal "Game paused by [host]"; host sees Resume.
-- **Host menu:** Pause/Resume, Close room.
+- **⋯ menu** (at the end of the opponent row): Herds, Rules & settings, Log; the host also gets Pause/Resume and Close room.
 
 ---
 

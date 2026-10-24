@@ -65,6 +65,7 @@ Try on 3 or more real phones, covering what automated tests can't:
 - The room closes 5 min after the end screen, and Play again cancels that.
 - At 740×360, check that these fit without scrolling: the lobby's host side column, the Offer and Pay money sheets with a large hand, and the rules and log panels.
 - Opponent panels wrap their animal chips cleanly when a player holds many animals.
+- Check the table on the smallest and largest phone in the group
 - Animal frame colours look right, and a complete set gets the gold outline.
 - Reconnect after closing a tab (close handshake) and after switching between Wi-Fi and cellular. The "Reconnecting…" badge appears and then clears.
 - On iPhone, install the PWA before joining a game. The home-screen app has separate storage, so it gets a new token and seat.
