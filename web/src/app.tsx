@@ -6,6 +6,7 @@ import { EndScreen } from "./ui/EndScreen";
 import { Toast } from "./ui/Toast";
 import { Home } from "./ui/Home";
 import { JoinLink } from "./ui/JoinLink";
+import { JoinRoom } from "./ui/JoinRoom";
 import { Lobby } from "./ui/Lobby";
 import { Table } from "./ui/Table";
 import { RoomForm } from "./ui/RoomForm";
@@ -26,6 +27,7 @@ function Screen() {
     const screen = homeScreen.value;
     if (screen === "home") return <Home />;
     if (screen === "create") return <RoomForm />;
+    if (screen === "join") return <JoinRoom />;
     return <JoinLink roomId={screen.join} />;
   }
   // The last view stays on screen while the socket is down, so say that it may be stale.

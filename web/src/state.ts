@@ -13,7 +13,7 @@ export const errorCode = signal<ErrorCode | null>(null);
 /** Bumped on every server error, so controls waiting on a reply can re-enable. */
 export const errorSeq = signal(0);
 export const offset = signal(0);
-export const homeScreen = signal<"home" | "create" | { join: string }>("home");
+export const homeScreen = signal<"home" | "create" | "join" | { join: string }>("home");
 export const picked = signal<string[]>([]);
 
 /** Adds the id if absent, removes it if present. */

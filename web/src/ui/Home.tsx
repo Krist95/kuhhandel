@@ -12,6 +12,7 @@ export function Home() {
       )}
       <div class="row">
         <button onClick={() => { toast.value = null; homeScreen.value = "create"; }}>Create room</button>
+        <button onClick={() => { toast.value = null; homeScreen.value = "join"; }}>Join room</button>
       </div>
     </div>
   );
