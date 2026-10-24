@@ -1,4 +1,4 @@
-name = "kuhhandel"
+name = "play"
 main = "src/worker.ts"
 compatibility_date = "2026-10-01"
 
