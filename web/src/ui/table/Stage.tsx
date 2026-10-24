@@ -5,6 +5,8 @@ import { LotCard } from "./Animals";
 import { CardBack } from "./Money";
 
 const HINT = "color:var(--paper);opacity:.85";
+const HINT_ROUND1 = "color:var(--paper);opacity:.8";
+const HINT_DECIDING = "color:var(--paper);opacity:.7";
 
 function Pile(props: { deck: number; donkeys: number }) {
   const { deck, donkeys } = props;
@@ -30,13 +32,34 @@ export function Stage(props: { room: RoomView; game: GameView; meId: string }) {
   switch (ph.kind) {
     case "action": {
       const me = ph.playerId === meId;
-      const first = game.deckCount === 40;
-      body = (
-        <div class="kh-info">
-          <span class="kh-cap">{first ? "Round 1" : me ? "Your turn" : `${nameOf(ph.playerId)}’s turn`}</span>
-          <div class="kh-banner">{first ? (me ? "You open." : `${nameOf(ph.playerId)} opens.`) : me ? "Your turn." : `${nameOf(ph.playerId)}’s turn.`}</div>
-        </div>
-      );
+      const n = game.deckCount;
+      if (n === 40) {
+        body = (
+          <div class="kh-info">
+            <span class="kh-cap">Round 1</span>
+            {me ? (
+              <>
+                <div class="kh-banner">You open. <span>Flip a card or… no, flip a card.</span></div>
+                <div class="kh-hint" style={HINT_ROUND1}>Nobody owns an animal yet, so a cow trade isn’t possible.</div>
+              </>
+            ) : (
+              <div class="kh-banner">{nameOf(ph.playerId)} opens.</div>
+            )}
+          </div>
+        );
+      } else {
+        body = (
+          <div class="kh-info">
+            <span class="kh-cap">{n === 0 ? "Deck empty" : n <= 10 ? `Late game · ${n} cards left` : `${n} cards left`}</span>
+            {me ? (
+              <div class="kh-banner">Your turn.</div>
+            ) : (
+              <div class="kh-banner">{nameOf(ph.playerId)}’s turn. <span>Choosing an action.</span></div>
+            )}
+            <div class="kh-hint" style={HINT}>Tap any pod to compare every herd.</div>
+          </div>
+        );
+      }
       break;
     }
     case "bidding":
@@ -113,7 +136,7 @@ export function Stage(props: { room: RoomView; game: GameView; meId: string }) {
             <span class="vs">vs</span>
             <div class="side">
               <span class="kh-cap">{whoIs(defenderId)}</span>
-              <div class="notes"><span class="kh-hint" style="color:var(--paper);opacity:.7">deciding…</span></div>
+              <div class="notes"><span class="kh-hint" style={HINT_DECIDING}>deciding…</span></div>
             </div>
           </div>
           <div class="kh-hint" style={HINT}>Values stay hidden. Only the two of you see them after.</div>
