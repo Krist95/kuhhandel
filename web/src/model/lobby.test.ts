@@ -6,9 +6,9 @@ import { formProblems, lobbySeats, nameProblem, normalizeRoomId, shareText } fro
 describe("lobby model", () => {
   it("normalizes room IDs", () => expect(normalizeRoomId(" abc-23x ")).toBe("ABC23X"));
   it("checks create forms against the server limits", () => {
-    expect(formProblems({ roomName: "", playerName: " ", moneyRule: "swap", decisionSeconds: 20 }, "create"))
+    expect(formProblems({ roomName: "", playerName: " " }, "create"))
       .toEqual([ERROR_TEXT.badRoomName, ERROR_TEXT.badName]);
-    expect(formProblems({ roomName: "Barn", playerName: "Ben", moneyRule: "swap", decisionSeconds: 20 }, "create")).toEqual([]);
+    expect(formProblems({ roomName: "Barn", playerName: "Ben" }, "create")).toEqual([]);
   });
   it("builds the share text with the join link and no password", () => {
     const text = shareText("ABC123", "https://x.test/join/ABC123");

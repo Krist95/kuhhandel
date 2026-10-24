@@ -1,7 +1,7 @@
 import type { PublicPlayer } from "../../../src/protocol";
 import { ERROR_TEXT } from "../../../src/rules/errors";
 
-export interface RoomFormValues { roomName: string; playerName: string; moneyRule: "swap" | "loserTakesBoth"; decisionSeconds: number }
+export interface RoomFormValues { roomName: string; playerName: string }
 
 const len = (s: string): number => [...s].length;
 const within = (s: string, min: number, max: number): boolean => len(s) >= min && len(s) <= max;
