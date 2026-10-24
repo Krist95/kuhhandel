@@ -6,7 +6,7 @@ import { connect, roomStub, setupGame } from "./client";
 
 // reset() only wipes objects that are still running, so it must come before abortAllDurableObjects().
 afterEach(async () => { await reset(); await abortAllDurableObjects(); });
-const create = { type: "createRoom", roomName: "B", playerName: "Zed", moneyRule: "swap", decisionSeconds: 20 } as const;
+const create = { type: "createRoom", roomName: "B", playerName: "Zed" } as const;
 const ben = (v: View) => v.room!.players.find((p) => p.name === "Ben")!;
 
 describe("GameRoom", () => {
@@ -45,8 +45,9 @@ describe("GameRoom", () => {
     expect(await (await connect()).request({ type: "joinRoom", roomId: anna!.view.room!.roomId, playerName: "Fred" }))
       .toMatchObject({ code: "roomFull" });
   });
-  it("rejects createRoom with an invalid decisionSeconds", async () => {
-    expect(await (await connect()).request({ type: "createRoom", roomName: "B", playerName: "Zed", moneyRule: "swap", decisionSeconds: 15 }))
+  it("rejects updateSettings with an invalid decisionSeconds", async () => {
+    const [anna] = await setupGame(["Anna"]);
+    expect(await anna!.request({ type: "updateSettings", decisionSeconds: 15 as never }))
       .toMatchObject({ code: "invalid" });
   });
   it("gives roomNotFound for an unknown room id, and rate-limits a connection after 5 failures", async () => {

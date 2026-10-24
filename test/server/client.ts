@@ -94,7 +94,7 @@ export const roomStub = (room = "main") => env.GAME_ROOM.get(env.GAME_ROOM.idFro
 
 export async function setupGame(names: string[], room = "main"): Promise<TestClient[]> {
   const host = await connect(crypto.randomUUID(), room);
-  const created = await host.request({ type: "createRoom", roomName: "Barn", playerName: names[0]!, moneyRule: "swap", decisionSeconds: 20 });
+  const created = await host.request({ type: "createRoom", roomName: "Barn", playerName: names[0]! });
   if (created.type !== "view") throw new Error(`createRoom failed: ${JSON.stringify(created)}`);
   const clients = [host];
   for (const name of names.slice(1)) {

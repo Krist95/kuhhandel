@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { by, createAction, fail, joinAction, lobby, outcome, pl, run, T0, tok } from "./helpers";
+import { by, createAction, fail, joinAction, lobby, outcome, pl, run, T0, tok, updateSettingsAction } from "./helpers";
 
 describe("lobby", () => {
   it("stores the given room ID uppercased, with a connected host and the given settings", () => {
@@ -10,13 +10,20 @@ describe("lobby", () => {
     expect(pl(r, "Anna")).toMatchObject({ seat: 1, connected: true });
     expect(r.settings).toEqual({ moneyRule: "swap", decisionSeconds: 20 });
   });
-  it("creates a room with explicit settings", () => {
-    const r = run(null, createAction("Anna", { moneyRule: "loserTakesBoth", decisionSeconds: 60 }))!;
-    expect(r.settings).toEqual({ moneyRule: "loserTakesBoth", decisionSeconds: 60 });
+  it("creates a room with default settings", () => {
+    const r = run(null, createAction())!;
+    expect(r.settings).toEqual({ moneyRule: "swap", decisionSeconds: 20 });
   });
-  it("rejects invalid settings on creation", () => {
-    expect(fail(null, createAction("Anna", { decisionSeconds: 15 }))).toBe("invalid");
-    expect(fail(null, createAction("Anna", { moneyRule: "bogus" as never }))).toBe("invalid");
+  it("lets the host update settings in the lobby, partially or fully, before the game starts", () => {
+    let r = run(lobby(), updateSettingsAction("Anna", { decisionSeconds: 60 }))!;
+    expect(r.settings).toEqual({ moneyRule: "swap", decisionSeconds: 60 });
+    r = run(r, updateSettingsAction("Anna", { moneyRule: "loserTakesBoth", decisionSeconds: 10 }))!;
+    expect(r.settings).toEqual({ moneyRule: "loserTakesBoth", decisionSeconds: 10 });
+  });
+  it("rejects invalid settings on update, and rejects non-host or mid-game updates", () => {
+    expect(fail(lobby(), updateSettingsAction("Anna", { decisionSeconds: 15 }))).toBe("invalid");
+    expect(fail(lobby(), updateSettingsAction("Anna", { moneyRule: "bogus" as never }))).toBe("invalid");
+    expect(fail(lobby(), updateSettingsAction("Ben", { decisionSeconds: 60 }))).toBe("notHost");
   });
   it("refuses a second room and joining a missing room", () => {
     expect(fail(lobby(), createAction("Zed"))).toBe("roomInUse");

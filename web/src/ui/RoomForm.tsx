@@ -15,7 +15,7 @@ export function RoomForm() {
     const p = formProblems(f, "create");
     setProblems(p);
     if (p.length > 0) return;
-    sendOrToast({ type: "createRoom", roomName: f.roomName.trim(), playerName: f.playerName.trim(), moneyRule: f.moneyRule, decisionSeconds: f.decisionSeconds });
+    sendOrToast({ type: "createRoom", roomName: f.roomName.trim(), playerName: f.playerName.trim() });
   };
 
   return (

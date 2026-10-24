@@ -6,7 +6,7 @@ import type {
 
 export type ClientMessage =
   | { type: "hello"; clientToken: string }
-  | { type: "createRoom"; roomName: string; playerName: string; moneyRule: Settings["moneyRule"]; decisionSeconds: number }
+  | { type: "createRoom"; roomName: string; playerName: string }
   | { type: "joinRoom"; roomId: string; playerName: string }
   | Intent;
 export type ServerMessage =
@@ -50,8 +50,13 @@ export function parseClientMessage(raw: string): ClientMessage | null {
     case "hello":
       return str(m.clientToken, 1, 64) ? { type: "hello", clientToken: m.clientToken } : null;
     case "createRoom":
-      return str(m.roomName, 0, 100) && str(m.playerName, 0, 100) && oneOf(m.moneyRule, ["swap", "loserTakesBoth"] as const) && num(m.decisionSeconds)
-        ? { type: "createRoom", roomName: m.roomName, playerName: m.playerName, moneyRule: m.moneyRule, decisionSeconds: m.decisionSeconds } : null;
+      return str(m.roomName, 0, 100) && str(m.playerName, 0, 100)
+        ? { type: "createRoom", roomName: m.roomName, playerName: m.playerName } : null;
+    case "updateSettings":
+      return (m.moneyRule === undefined || oneOf(m.moneyRule, ["swap", "loserTakesBoth"] as const))
+          && (m.decisionSeconds === undefined || num(m.decisionSeconds))
+        ? { type: "updateSettings", moneyRule: m.moneyRule as Settings["moneyRule"] | undefined, decisionSeconds: m.decisionSeconds as Settings["decisionSeconds"] | undefined }
+        : null;
     case "joinRoom":
       return str(m.roomId, 0, 20) && str(m.playerName, 0, 100)
         ? { type: "joinRoom", roomId: m.roomId, playerName: m.playerName } : null;

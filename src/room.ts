@@ -3,7 +3,7 @@ import { parseClientMessage, type ClientMessage, type ServerMessage } from "./pr
 import { reduce } from "./rules/engine";
 import { ERROR_TEXT, type ErrorCode } from "./rules/errors";
 import { nextDeadline } from "./rules/timers";
-import type { Action, Room, Settings } from "./rules/types";
+import type { Action, Room } from "./rules/types";
 import { buildView } from "./rules/view";
 
 interface Attachment { token: string | null; fails: number[] }  // fails = timestamps of bad-room-id joins
@@ -106,9 +106,7 @@ export class GameRoom extends DurableObject<Env> {
 
   private async createRoom(ws: WebSocket, token: string, msg: Extract<ClientMessage, { type: "createRoom" }>, now: number): Promise<void> {
     if (this.room) return sendError(ws, "roomInUse");
-    // decisionSeconds is untrusted input (plain `number` on the wire); createRoom validates it against DECISION_SECONDS at runtime.
-    await this.dispatch({ type: "create", token, roomId: this.ctx.id.name ?? "main", roomName: msg.roomName, playerName: msg.playerName,
-      moneyRule: msg.moneyRule, decisionSeconds: msg.decisionSeconds as Settings["decisionSeconds"] }, now, ws);
+    await this.dispatch({ type: "create", token, roomId: this.ctx.id.name ?? "main", roomName: msg.roomName, playerName: msg.playerName }, now, ws);
   }
 
   private async joinRoom(ws: WebSocket, token: string, msg: Extract<ClientMessage, { type: "joinRoom" }>, now: number): Promise<void> {

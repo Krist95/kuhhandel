@@ -8,19 +8,26 @@ describe("parseClientMessage", () => {
     const offer = { type: "cowTradeOffer", targetId: "p1", animal: "cow", count: 2, cardIds: ["a"] };
     expect(parseClientMessage(JSON.stringify(offer))).toEqual(offer);
   });
-  it("accepts createRoom with settings and joinRoom with no password or seat", () => {
-    const create = { type: "createRoom", roomName: "x", playerName: "y", moneyRule: "swap", decisionSeconds: 20 };
+  it("accepts createRoom and joinRoom with no password or seat", () => {
+    const create = { type: "createRoom", roomName: "x", playerName: "y" };
     expect(parseClientMessage(JSON.stringify(create))).toEqual(create);
     const join = { type: "joinRoom", roomId: "ABC123", playerName: "y" };
     expect(parseClientMessage(JSON.stringify(join))).toEqual(join);
+  });
+  it("accepts updateSettings with either field, both fields, or neither", () => {
+    expect(parseClientMessage(JSON.stringify({ type: "updateSettings", moneyRule: "swap" })))
+      .toEqual({ type: "updateSettings", moneyRule: "swap", decisionSeconds: undefined });
+    expect(parseClientMessage(JSON.stringify({ type: "updateSettings", decisionSeconds: 60 })))
+      .toEqual({ type: "updateSettings", moneyRule: undefined, decisionSeconds: 60 });
+    expect(parseClientMessage(JSON.stringify({ type: "updateSettings" })))
+      .toEqual({ type: "updateSettings", moneyRule: undefined, decisionSeconds: undefined });
   });
   it.each([
     "not json", "[]", "null", '{"type":"nope"}', '{"type":"bid","amount":"20"}', '{"type":"bid","amount":1e999}',
     '{"type":"pay","cardIds":"a"}', '{"type":"pay","cardIds":[1]}', '{"type":"chooseAction","action":"steal"}',
     '{"type":"cowTradeOffer","targetId":"p","animal":"unicorn","count":1,"cardIds":[]}',
     JSON.stringify({ type: "hello", clientToken: "x".repeat(65) }), JSON.stringify({ type: "pay", cardIds: Array(61).fill("a") }), "x".repeat(5000),
-    '{"type":"createRoom","roomName":"x","playerName":"y","moneyRule":"swap"}',
-    '{"type":"createRoom","roomName":"x","playerName":"y","moneyRule":"bogus","decisionSeconds":20}',
-    JSON.stringify({ type: "updateSettings", moneyRule: "swap" }),
+    JSON.stringify({ type: "updateSettings", moneyRule: "bogus" }),
+    JSON.stringify({ type: "updateSettings", decisionSeconds: "20" }),
   ])("rejects malformed input %#", (raw) => expect(parseClientMessage(raw)).toBeNull());
 });
