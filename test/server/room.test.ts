@@ -6,7 +6,7 @@ import { connect, roomStub, setupGame } from "./client";
 
 // reset() only wipes objects that are still running, so it must come before abortAllDurableObjects().
 afterEach(async () => { await reset(); await abortAllDurableObjects(); });
-const create = { type: "createRoom", roomName: "B", password: "x", playerName: "Zed", seat: 2 } as const;
+const create = { type: "createRoom", roomName: "B", playerName: "Zed", moneyRule: "swap", decisionSeconds: 20 } as const;
 const ben = (v: View) => v.room!.players.find((p) => p.name === "Ben")!;
 
 describe("GameRoom", () => {
@@ -22,18 +22,24 @@ describe("GameRoom", () => {
     expect(await (await connect()).request(create))
       .toEqual({ type: "error", code: "roomInUse", message: "A room is already in use. Ask the host for the room ID and password." });
   });
-  it("gives one error for a wrong ID or password, and rate-limits a connection after 5 failures", async () => {
+  it("gives roomNotFound for an unknown room id, and rate-limits a connection after 5 failures", async () => {
     const [anna] = await setupGame(["Anna"]);
     const roomId = anna!.view.room!.roomId, zed = await connect();
-    const join = (id: string, password: string) => zed.request({ type: "joinRoom", roomId: id, password, playerName: "Zed", seat: 2 });
-    const badId = await join("ZZZZZZ", "pw"), badPw = await join(roomId, "nope");
-    expect(badId).toEqual(badPw);
-    expect(badId).toMatchObject({ code: "badCredentials", message: "Room not found or wrong password." });
-    for (let i = 0; i < 3; i++) await join(roomId, "nope");
-    expect(await join(roomId, "pw")).toMatchObject({ code: "tooManyAttempts" });
+    const join = (id: string) => zed.request({ type: "joinRoom", roomId: id, playerName: "Zed" });
+    const badId = await join("ZZZZZZ");
+    expect(badId).toMatchObject({ code: "roomNotFound", message: "Room not found." });
+    for (let i = 0; i < 4; i++) await join("ZZZZZZ");
+    expect(await join("ZZZZZZ")).toMatchObject({ code: "tooManyAttempts" });
     const fresh = await connect();
-    expect(await fresh.request({ type: "joinRoom", roomId: roomId.toLowerCase(), password: "pw", playerName: "Zed", seat: 2 }))
+    expect(await fresh.request({ type: "joinRoom", roomId: roomId.toLowerCase(), playerName: "Zed" }))
       .toMatchObject({ type: "view" });
+  });
+  it("gives gameStarted for a room that's no longer in the lobby", async () => {
+    const [anna] = await setupGame(["Anna", "Ben", "Clara"]);
+    await anna!.request({ type: "startGame" });
+    const roomId = anna!.view.room!.roomId;
+    expect(await (await connect()).request({ type: "joinRoom", roomId, playerName: "Dan" }))
+      .toMatchObject({ code: "gameStarted" });
   });
   it("restores seat and view on reconnect with the same token", async () => {
     const [anna, b] = await setupGame(["Anna", "Ben"]);
@@ -70,7 +76,7 @@ describe("GameRoom", () => {
     const [anna, b] = await setupGame(["Anna", "Ben"]);
     anna!.send({ type: "removePlayer", playerId: b!.view.me!.id });
     expect(await b!.next("removed")).toEqual({ type: "removed" });
-    expect(await b!.request({ type: "joinRoom", roomId: anna!.view.room!.roomId, password: "pw", playerName: "Ben", seat: 2 }))
+    expect(await b!.request({ type: "joinRoom", roomId: anna!.view.room!.roomId, playerName: "Ben" }))
       .toMatchObject({ code: "blocked" });
   });
   it("answers malformed messages with badMessage", async () => {

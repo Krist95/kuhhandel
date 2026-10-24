@@ -30,17 +30,6 @@ describe("views", () => {
       expect(Object.keys(v.room!.players[0]!).sort()).toEqual(["away", "connected", "herd", "id", "moneyCount", "name", "out", "seat"]);
     }
   });
-  it("never includes the room's password hash or salt", () => {
-    const finished = game(NAMES, { deck: [], herds: { Anna: { horse: 4 } } });
-    for (const base of [lobby(), game(), finished]) {
-      const r: Room = { ...base, passwordHash: "HASH-5f3a9c0e", passwordSalt: "SALT-c81d2e47" };
-      for (const n of NAMES) {
-        const s = json(view(r, n));
-        expect(s).not.toContain("HASH-5f3a9c0e");
-        expect(s).not.toContain("SALT-c81d2e47");
-      }
-    }
-  });
   it("shows Buy availability only to the auctioneer, and others cannot tell the difference", () => {
     const poor = auctionTo(game(NAMES, { money: { Anna: [10, 10, 10, 10, 10, 10, 10] } }), 100);
     const rich = auctionTo(game(NAMES, { money: { Anna: [50, 50, 50, 10, 10, 10, 10] } }), 100);

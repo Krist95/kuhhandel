@@ -23,8 +23,8 @@ export function fail(room: Room | null, action: Action, now = T0): ErrorCode {
   return o.error.code;
 }
 export const by = (name: string, intent: Intent): Action => ({ type: "intent", token: tok(name), intent });
-export const createAction = (name = "Anna", settings: Partial<Settings> = {}): Action =>
-  ({ type: "create", token: tok(name), roomName: "Barn", playerName: name, moneyRule: "swap", decisionSeconds: 20, ...settings });
+export const createAction = (name = "Anna", settings: { moneyRule?: unknown; decisionSeconds?: unknown } = {}): Action =>
+  ({ type: "create", token: tok(name), roomName: "Barn", playerName: name, moneyRule: "swap", decisionSeconds: 20, ...settings } as Action);
 export const joinAction = (name: string): Action => ({ type: "join", token: tok(name), playerName: name });
 export function lobby(names = NAMES): Room {
   let r = run(null, createAction(names[0]));

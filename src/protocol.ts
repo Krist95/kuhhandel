@@ -6,8 +6,8 @@ import type {
 
 export type ClientMessage =
   | { type: "hello"; clientToken: string }
-  | { type: "createRoom"; roomName: string; password: string; playerName: string; seat: number }
-  | { type: "joinRoom"; roomId: string; password: string; playerName: string; seat: number }
+  | { type: "createRoom"; roomName: string; playerName: string; moneyRule: Settings["moneyRule"]; decisionSeconds: number }
+  | { type: "joinRoom"; roomId: string; playerName: string }
   | Intent;
 export type ServerMessage =
   | { type: "view"; view: View } | { type: "error"; code: ErrorCode; message: string }
@@ -50,27 +50,15 @@ export function parseClientMessage(raw: string): ClientMessage | null {
     case "hello":
       return str(m.clientToken, 1, 64) ? { type: "hello", clientToken: m.clientToken } : null;
     case "createRoom":
-      return str(m.roomName, 0, 100) && str(m.password, 0, 200) && str(m.playerName, 0, 100) && num(m.seat)
-        ? { type: "createRoom", roomName: m.roomName, password: m.password, playerName: m.playerName, seat: m.seat } : null;
+      return str(m.roomName, 0, 100) && str(m.playerName, 0, 100) && oneOf(m.moneyRule, ["swap", "loserTakesBoth"] as const) && num(m.decisionSeconds)
+        ? { type: "createRoom", roomName: m.roomName, playerName: m.playerName, moneyRule: m.moneyRule, decisionSeconds: m.decisionSeconds } : null;
     case "joinRoom":
-      return str(m.roomId, 0, 20) && str(m.password, 0, 200) && str(m.playerName, 0, 100) && num(m.seat)
-        ? { type: "joinRoom", roomId: m.roomId, password: m.password, playerName: m.playerName, seat: m.seat } : null;
+      return str(m.roomId, 0, 20) && str(m.playerName, 0, 100)
+        ? { type: "joinRoom", roomId: m.roomId, playerName: m.playerName } : null;
     case "leaveSeat": case "startGame": case "pass": case "pause": case "resume": case "closeRoom": case "playAgain": case "imBack":
       return { type: m.type };
     case "removePlayer":
       return str(m.playerId, 0, 64) ? { type: "removePlayer", playerId: m.playerId } : null;
-    case "updateSettings": {
-      const out: { type: "updateSettings"; moneyRule?: Settings["moneyRule"]; decisionSeconds?: number } = { type: "updateSettings" };
-      if (m.moneyRule !== undefined) {
-        if (!oneOf(m.moneyRule, ["swap", "loserTakesBoth"] as const)) return null;
-        out.moneyRule = m.moneyRule;
-      }
-      if (m.decisionSeconds !== undefined) {
-        if (!num(m.decisionSeconds)) return null;
-        out.decisionSeconds = m.decisionSeconds;
-      }
-      return out;
-    }
     case "chooseAction":
       return oneOf(m.action, ["auction", "cowTrade"] as const) ? { type: "chooseAction", action: m.action } : null;
     case "bid":
