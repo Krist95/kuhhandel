@@ -1,0 +1,37 @@
+:root{
+  --felt:#1f5a43;
+  --felt-dark:#16352a;
+  --felt-deep:#0f271f;
+  --line:#2f6e55;
+  --paper:#fbf7ee;
+  --ink:#1e1e1e;
+  --ink-soft:#5a5650;
+  --muted:#9aa59f;
+  --accent:#f2b33d;
+  --danger:#d7443e;
+  --online:#5bd17f;
+  --set-gold:#ffd700;
+  --animal-rooster:#d7443e;
+  --animal-goose:#4a9be0;
+  --animal-cat:#8a56b8;
+  --animal-dog:#9c6b3f;
+  --animal-sheep:#e6dfcb;
+  --animal-goat:#7a9a2e;
+  --animal-donkey:#6e7b8b;
+  --animal-pig:#ec8db4;
+  --animal-cow:#1f9e8f;
+  --animal-horse:#e8b230;
+  --space-1:4px;
+  --space-2:6px;
+  --space-3:8px;
+  --space-4:12px;
+  --space-5:16px;
+  --radius-sm:6px;
+  --radius-md:8px;
+  --radius-lg:12px;
+  --radius-table:28px;
+  --radius-pill:999px;
+  --lift:0 2px 0 #0b1d16;
+  --lift-lg:0 4px 0 #0b1d16;
+  --font-sans:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}

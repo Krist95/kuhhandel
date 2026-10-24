@@ -8,6 +8,8 @@ import { alertKey, shouldAlert } from "./model/alerts";
 import { startConnection } from "./net/socket";
 import { view } from "./state";
 import "./styles.css";
+import "./styles/tokens.css";
+import "./styles/table.css";
 
 render(<App />, document.getElementById("app")!);
 startConnection();

@@ -1,7 +1,3 @@
-:root {
-  --felt: #1F5A43; --felt-dark: #16352A; --ink: #1E1E1E; --paper: #FBF7EE;
-  --accent: #F2B33D; --danger: #D7443E; --muted: #9AA59F;
-}
 html, body, #app { height: 100%; margin: 0; overflow: hidden; }
 body {
   background: var(--felt-dark); color: var(--paper);
