@@ -12,8 +12,8 @@ export interface TestClient {
 
 const WAIT_MS = 2000;
 
-export async function connect(token = crypto.randomUUID()): Promise<TestClient> {
-  const res = await exports.default.fetch("https://kuhhandel.test/ws", { headers: { Upgrade: "websocket" } });
+export async function connect(token = crypto.randomUUID(), room = "main"): Promise<TestClient> {
+  const res = await exports.default.fetch(`https://kuhhandel.test/ws?room=${room}`, { headers: { Upgrade: "websocket" } });
   const ws = res.webSocket;
   if (!ws) throw new Error(`expected a WebSocket upgrade, got HTTP ${res.status}`);
   ws.accept();
@@ -90,15 +90,15 @@ export async function connect(token = crypto.randomUUID()): Promise<TestClient> 
   return client;
 }
 
-export const roomStub = () => env.GAME_ROOM.get(env.GAME_ROOM.idFromName("main"));
+export const roomStub = (room = "main") => env.GAME_ROOM.get(env.GAME_ROOM.idFromName(room));
 
-export async function setupGame(names: string[]): Promise<TestClient[]> {
-  const host = await connect();
+export async function setupGame(names: string[], room = "main"): Promise<TestClient[]> {
+  const host = await connect(crypto.randomUUID(), room);
   const created = await host.request({ type: "createRoom", roomName: "Barn", playerName: names[0]!, moneyRule: "swap", decisionSeconds: 20 });
   if (created.type !== "view") throw new Error(`createRoom failed: ${JSON.stringify(created)}`);
   const clients = [host];
   for (const name of names.slice(1)) {
-    const c = await connect();
+    const c = await connect(crypto.randomUUID(), room);
     const joined = await c.request({ type: "joinRoom", roomId: host.view.room!.roomId, playerName: name });
     if (joined.type !== "view") throw new Error(`joinRoom failed for ${name}: ${JSON.stringify(joined)}`);
     clients.push(c);

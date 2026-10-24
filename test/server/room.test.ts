@@ -27,6 +27,15 @@ describe("GameRoom", () => {
     expect(await (await connect()).request(create))
       .toEqual({ type: "error", code: "roomInUse", message: "A game is already running here. Ask the host for the invite link." });
   });
+  it("keeps two rooms created at the same time fully independent", async () => {
+    const [anna] = await setupGame(["Anna"], "room-a");
+    const [bo] = await setupGame(["Bo"], "room-b");
+    expect(anna!.view.room!.roomId).not.toBe(bo!.view.room!.roomId);
+    expect(await (await connect(crypto.randomUUID(), "room-a")).request({ type: "joinRoom", roomId: bo!.view.room!.roomId, playerName: "Cid" }))
+      .toMatchObject({ code: "roomNotFound" });
+    expect(await (await connect(crypto.randomUUID(), "room-a")).request({ type: "joinRoom", roomId: anna!.view.room!.roomId, playerName: "Cid" }))
+      .toMatchObject({ type: "view" });
+  });
   it("gives roomNotFound when joining with no room created yet", async () => {
     expect(await (await connect()).request({ type: "joinRoom", roomId: "ZZZZZZ", playerName: "Zed" }))
       .toMatchObject({ code: "roomNotFound" });

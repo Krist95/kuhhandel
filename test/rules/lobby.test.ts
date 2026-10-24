@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { by, createAction, fail, joinAction, lobby, outcome, pl, run, T0, tok } from "./helpers";
 
 describe("lobby", () => {
-  it("creates a room with a 6-char ID, a connected host and the given settings", () => {
+  it("stores the given room ID uppercased, with a connected host and the given settings", () => {
     const r = run(null, createAction())!;
     expect(r.status).toBe("LOBBY");
-    expect(r.roomId).toMatch(/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);
+    expect(r.roomId).toBe("AB12CD");
     expect(r.hostId).toBe(pl(r, "Anna").id);
     expect(pl(r, "Anna")).toMatchObject({ seat: 1, connected: true });
     expect(r.settings).toEqual({ moneyRule: "swap", decisionSeconds: 20 });

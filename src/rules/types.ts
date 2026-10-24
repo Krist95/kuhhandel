@@ -64,7 +64,7 @@ export type Intent =
   | { type: "cowTradeResponse"; cardIds: string[] }
   | { type: "pause" } | { type: "resume" } | { type: "closeRoom" } | { type: "playAgain" } | { type: "imBack" };
 export type Action =
-  | { type: "create"; token: string; roomName: string; playerName: string; moneyRule: Settings["moneyRule"]; decisionSeconds: Settings["decisionSeconds"] }
+  | { type: "create"; token: string; roomId: string; roomName: string; playerName: string; moneyRule: Settings["moneyRule"]; decisionSeconds: Settings["decisionSeconds"] }
   | { type: "join"; token: string; playerName: string }
   | { type: "connect"; token: string } | { type: "disconnect"; token: string }
   | { type: "intent"; token: string; intent: Intent } | { type: "tick" };

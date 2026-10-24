@@ -1,5 +1,5 @@
 import { TableScenes } from "./dev/TableScenes";
-import { startConnection } from "./net/socket";
+import { reconnect } from "./net/socket";
 import { conn, homeScreen, view } from "./state";
 import { ArtPreview } from "./ui/ArtPreview";
 import { EndScreen } from "./ui/EndScreen";
@@ -17,7 +17,7 @@ function Screen() {
     return (
       <div class="center">
         <p>This game is open in another tab or window.</p>
-        <button onClick={() => startConnection()}>Use here</button>
+        <button onClick={() => reconnect()}>Use here</button>
       </div>
     );
   }

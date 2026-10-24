@@ -18,6 +18,7 @@ let attempt = 0;
 let replaced = false;
 let listening = false;
 let token: string | null = null;
+let roomId = "main";
 
 function clearWatchdog(): void {
   clearTimeout(watchdog); watchdog = undefined;
@@ -77,7 +78,7 @@ function open(): void {
   replaced = false;
   conn.value = "connecting";
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
-  const sock = new WebSocket(`${proto}//${location.host}/ws`);
+  const sock = new WebSocket(`${proto}//${location.host}/ws?room=${encodeURIComponent(roomId)}`);
   ws = sock;
   sock.onopen = () => {
     attempt = 0;
@@ -106,7 +107,8 @@ function open(): void {
   };
 }
 
-export function startConnection(): void {
+export function startConnection(forRoomId: string): void {
+  roomId = forRoomId;
   if (!listening) {
     listening = true;
     document.addEventListener("visibilitychange", () => {
@@ -116,6 +118,11 @@ export function startConnection(): void {
   }
   attempt = 0;
   open();
+}
+
+/** Reopens the socket for whichever room startConnection last picked, e.g. after a tab takes over from another. */
+export function reconnect(): void {
+  startConnection(roomId);
 }
 
 /** Never throws. Returns true if the message was handed to an open socket. */

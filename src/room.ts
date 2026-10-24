@@ -107,7 +107,7 @@ export class GameRoom extends DurableObject<Env> {
   private async createRoom(ws: WebSocket, token: string, msg: Extract<ClientMessage, { type: "createRoom" }>, now: number): Promise<void> {
     if (this.room) return sendError(ws, "roomInUse");
     // decisionSeconds is untrusted input (plain `number` on the wire); createRoom validates it against DECISION_SECONDS at runtime.
-    await this.dispatch({ type: "create", token, roomName: msg.roomName, playerName: msg.playerName,
+    await this.dispatch({ type: "create", token, roomId: this.ctx.id.name ?? "main", roomName: msg.roomName, playerName: msg.playerName,
       moneyRule: msg.moneyRule, decisionSeconds: msg.decisionSeconds as Settings["decisionSeconds"] }, now, ws);
   }
 

@@ -40,7 +40,7 @@ async function load() {
 }
 async function online() {
   const s = await load();
-  s.startConnection();
+  s.startConnection("main");
   const sock = last();
   sock.serverOpen();
   return { s, sock };
@@ -63,7 +63,7 @@ describe("connection", () => {
 
   it("closes a socket that stays silent for 10 s after a ping, then reconnects with backoff", async () => {
     const { s, sock } = await online();
-    expect(sock.url).toBe("wss://kuhhandel.test/ws");
+    expect(sock.url).toBe("wss://kuhhandel.test/ws?room=main");
     expect(JSON.parse(sock.sent[0]!)).toMatchObject({ type: "hello" });
     expect(s.conn.value).toBe("online");
     vi.advanceTimersByTime(25_000);
@@ -129,7 +129,7 @@ describe("connection", () => {
   it("send() says whether the message went out; sendOrToast tells the player when it did not", async () => {
     const s = await load();
     expect(s.send({ type: "pass" })).toBe(false); // no socket yet
-    s.startConnection();
+    s.startConnection("main");
     const sock = last();
     expect(s.send({ type: "pass" })).toBe(false); // still connecting
     sock.serverOpen();

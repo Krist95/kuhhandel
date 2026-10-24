@@ -44,7 +44,10 @@ export function createRoom(a: Extract<Action, { type: "create" }>, tx: Tx): Room
   const name = normalizeName(a.playerName, 16);
   if (name === null) throw new RuleError("badName");
   const settings = validateSettings(a.moneyRule, a.decisionSeconds);
-  const roomId = randomId(tx.rng, 6, ROOM_ID_ALPHABET);
+  // The DO that owns this room already named it (a.roomId); draw the same number of rng calls as
+  // the old random-roomId path did, so an unrelated draw count change doesn't ripple into card/seat dealing.
+  randomId(tx.rng, 6, ROOM_ID_ALPHABET);
+  const roomId = a.roomId.trim().toUpperCase();
   const host = newPlayer(tx, [], a.token, name, 1);
   const room: Room = {
     status: "LOBBY", roomId, roomName,
