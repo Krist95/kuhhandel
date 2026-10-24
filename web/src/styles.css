@@ -67,7 +67,6 @@ input, select, textarea { font: inherit; padding: 0.3em 0.6em; border-radius: 0.
 .money-note.chip { height: 2em; }
 .money-note.card { height: 3.6em; }
 .row.notes { gap: 0.25em; }
-.sheet-buttons { display: flex; gap: 0.25em; justify-content: center; }
 .away-banner { display: flex; flex-direction: column; gap: 0.25em; text-align: center; font-size: 0.85em; }
 .overlay.picker { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.6); }
 .sheet { background: var(--felt-dark); border: 1px solid var(--muted); border-radius: 0.8em; padding: 0.6em 1em; max-width: 90vw; max-height: 94vh; overflow: hidden; display: flex; flex-direction: column; gap: 0.4em; align-items: center; box-sizing: border-box; }
