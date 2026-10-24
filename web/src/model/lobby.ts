@@ -1,7 +1,7 @@
 import type { PublicPlayer } from "../../../src/protocol";
 import { ERROR_TEXT } from "../../../src/rules/errors";
 
-export interface RoomFormValues { roomName: string; playerName: string; moneyRule: "swap" | "loserTakesBoth"; decisionSeconds: number }
+export interface RoomFormValues { roomName: string; playerName: string }
 
 const len = (s: string): number => [...s].length;
 const within = (s: string, min: number, max: number): boolean => len(s) >= min && len(s) <= max;
@@ -13,12 +13,12 @@ export function normalizeRoomId(input: string): string {
 export function formProblems(f: RoomFormValues, mode: "create"): string[] {
   const out: string[] = [];
   if (mode === "create" && !within(f.roomName.trim(), 1, 24)) out.push(ERROR_TEXT.badRoomName);
-  if (!within(f.playerName.trim(), 1, 16)) out.push(ERROR_TEXT.badName);
+  if (!within(f.playerName.trim(), 1, 24)) out.push(ERROR_TEXT.badName);
   return out;
 }
 
 export function nameProblem(playerName: string): string | null {
-  return within(playerName.trim(), 1, 16) ? null : ERROR_TEXT.badName;
+  return within(playerName.trim(), 1, 24) ? null : ERROR_TEXT.badName;
 }
 
 export function shareText(roomId: string, url: string): string {

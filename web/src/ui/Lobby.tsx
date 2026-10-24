@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import type { RoomView } from "../../../src/protocol";
+import { DECISION_SECONDS } from "../../../src/rules/types";
 import { lobbySeats, shareText } from "../model/lobby";
 import { sendOrToast } from "../net/socket";
 import { homeScreen, toast, view } from "../state";
@@ -53,6 +54,23 @@ export function Lobby(props: { room: RoomView }) {
         </div>
       </div>
       <div class="lobby-side">
+        {isHost && (
+          <div class="row">
+            <label>Cow trade money
+              <select value={room.settings.moneyRule}
+                onChange={(e) => sendOrToast({ type: "updateSettings", moneyRule: e.currentTarget.value as "swap" | "loserTakesBoth" })}>
+                <option value="swap">Swap</option>
+                <option value="loserTakesBoth">Loser takes both</option>
+              </select>
+            </label>
+            <label>Time per decision
+              <select value={room.settings.decisionSeconds}
+                onChange={(e) => sendOrToast({ type: "updateSettings", decisionSeconds: Number(e.currentTarget.value) as typeof DECISION_SECONDS[number] })}>
+                {DECISION_SECONDS.map((s) => <option value={s}>{s} s</option>)}
+              </select>
+            </label>
+          </div>
+        )}
         {isHost && (
           <div class="idbox">
             <div>Room ID <b>{room.roomId}</b></div>

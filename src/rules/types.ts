@@ -18,6 +18,7 @@ export type Seat = 1 | 2 | 3 | 4 | 5;
 export type Herd = Record<Animal, number>;
 export interface MoneyCard { id: string; value: MoneyValue }
 export interface Settings { moneyRule: "swap" | "loserTakesBoth"; decisionSeconds: (typeof DECISION_SECONDS)[number] }
+export const DEFAULT_SETTINGS: Settings = { moneyRule: "swap", decisionSeconds: 20 };
 export interface Player {
   id: string; token: string; name: string; seat: Seat; connected: boolean; disconnectedAt: number | null;
   money: MoneyCard[]; herd: Herd; out: boolean; away: boolean; timeouts: number; // consecutive timeouts
@@ -62,9 +63,10 @@ export type Intent =
   | { type: "auctioneerDecision"; decision: "sell" | "buy" } | { type: "pay"; cardIds: string[] }
   | { type: "cowTradeOffer"; targetId: string; animal: Animal; count: number; cardIds: string[] }
   | { type: "cowTradeResponse"; cardIds: string[] }
-  | { type: "pause" } | { type: "resume" } | { type: "closeRoom" } | { type: "playAgain" } | { type: "imBack" };
+  | { type: "pause" } | { type: "resume" } | { type: "closeRoom" } | { type: "playAgain" } | { type: "imBack" }
+  | { type: "updateSettings"; moneyRule?: Settings["moneyRule"]; decisionSeconds?: Settings["decisionSeconds"] };
 export type Action =
-  | { type: "create"; token: string; roomId: string; roomName: string; playerName: string; moneyRule: Settings["moneyRule"]; decisionSeconds: Settings["decisionSeconds"] }
+  | { type: "create"; token: string; roomId: string; roomName: string; playerName: string }
   | { type: "join"; token: string; playerName: string }
   | { type: "connect"; token: string } | { type: "disconnect"; token: string }
   | { type: "intent"; token: string; intent: Intent } | { type: "tick" };

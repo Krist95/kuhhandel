@@ -2,7 +2,7 @@ import { addLog, nextClockwise, playerById, type Tx } from "./engine";
 import { RuleError } from "./errors";
 import { randomId } from "./rng";
 import {
-  ANIMALS, DECISION_SECONDS, ROOM_ID_ALPHABET,
+  ANIMALS, DECISION_SECONDS, DEFAULT_SETTINGS, ROOM_ID_ALPHABET,
   type Action, type CloseReason, type Herd, type Player, type Room, type Seat, type Settings,
 } from "./types";
 
@@ -41,9 +41,8 @@ function firstOpenSeat(players: readonly Player[]): Seat {
 export function createRoom(a: Extract<Action, { type: "create" }>, tx: Tx): Room {
   const roomName = normalizeName(a.roomName, 24);
   if (roomName === null) throw new RuleError("badRoomName");
-  const name = normalizeName(a.playerName, 16);
+  const name = normalizeName(a.playerName, 24);
   if (name === null) throw new RuleError("badName");
-  const settings = validateSettings(a.moneyRule, a.decisionSeconds);
   // The DO that owns this room already named it (a.roomId); draw the same number of rng calls as
   // the old random-roomId path did, so an unrelated draw count change doesn't ripple into card/seat dealing.
   randomId(tx.rng, 6, ROOM_ID_ALPHABET);
@@ -51,17 +50,22 @@ export function createRoom(a: Extract<Action, { type: "create" }>, tx: Tx): Room
   const host = newPlayer(tx, [], a.token, name, 1);
   const room: Room = {
     status: "LOBBY", roomId, roomName,
-    hostId: host.id, players: [host], blockedTokens: [], settings,
+    hostId: host.id, players: [host], blockedTokens: [], settings: DEFAULT_SETTINGS,
     game: null, scores: null, log: [], logSeq: 0, finishedAt: null, nobodySince: null,
   };
   addLog(room, `${name} created the room.`);
   return room;
 }
 
+export function updateSettings(room: Room, patch: { moneyRule?: Settings["moneyRule"]; decisionSeconds?: Settings["decisionSeconds"] }, tx: Tx): void {
+  room.settings = validateSettings(patch.moneyRule ?? room.settings.moneyRule, patch.decisionSeconds ?? room.settings.decisionSeconds);
+  addLog(room, "Room settings were updated.");
+}
+
 export function joinRoom(room: Room, a: Extract<Action, { type: "join" }>, tx: Tx): void {
   if (room.blockedTokens.includes(a.token)) throw new RuleError("blocked");
   if (room.players.some((p) => p.token === a.token)) throw new RuleError("alreadySeated");
-  const name = normalizeName(a.playerName, 16);
+  const name = normalizeName(a.playerName, 24);
   if (name === null) throw new RuleError("badName");
   const lower = name.toLowerCase();
   if (room.players.some((p) => p.name.toLowerCase() === lower)) throw new RuleError("nameTaken");

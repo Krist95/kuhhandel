@@ -23,8 +23,9 @@ export function fail(room: Room | null, action: Action, now = T0): ErrorCode {
   return o.error.code;
 }
 export const by = (name: string, intent: Intent): Action => ({ type: "intent", token: tok(name), intent });
-export const createAction = (name = "Anna", settings: { moneyRule?: unknown; decisionSeconds?: unknown } = {}): Action =>
-  ({ type: "create", token: tok(name), roomId: "ab12cd", roomName: "Barn", playerName: name, moneyRule: "swap", decisionSeconds: 20, ...settings } as Action);
+export const createAction = (name = "Anna"): Action => ({ type: "create", token: tok(name), roomId: "ab12cd", roomName: "Barn", playerName: name });
+export const updateSettingsAction = (name: string, patch: { moneyRule?: unknown; decisionSeconds?: unknown }): Action =>
+  ({ type: "intent", token: tok(name), intent: { type: "updateSettings", ...patch } as never });
 export const joinAction = (name: string): Action => ({ type: "join", token: tok(name), playerName: name });
 export function lobby(names = NAMES): Room {
   let r = run(null, createAction(names[0]));
@@ -47,8 +48,9 @@ export function withTx(room: Room, fn: (draft: Room, tx: Tx) => void, now = T0):
   return draft;
 }
 export function game(names = NAMES, o: GameOpts = {}): Room {
-  let r = run(null, createAction(names[0], o.settings ?? {}));
+  let r = run(null, createAction(names[0]));
   for (let i = 1; i < names.length; i++) r = run(r, joinAction(names[i]));
+  if (o.settings) r = run(r, updateSettingsAction(names[0], o.settings));
   return withTx(run(r, by(names[0], { type: "startGame" }))!, (d, tx) => {
     if (o.deck) d.game!.deck = [...o.deck];
     for (const [name, values] of Object.entries(o.money ?? {})) pl(d, name).money = values.map((value, i) => ({ id: `${name}-${i + 1}`, value }));

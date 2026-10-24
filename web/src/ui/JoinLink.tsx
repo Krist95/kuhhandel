@@ -31,7 +31,7 @@ export function JoinLink(props: { roomId: string }) {
     <form class="form" onSubmit={submit}>
       <h2>Join room</h2>
       <div class="fields">
-        <input placeholder="Your name" value={playerName} onInput={(e) => { toast.value = null; setPlayerName(e.currentTarget.value); }} />
+        <input placeholder="Your name" value={playerName} maxLength={24} onInput={(e) => { toast.value = null; setPlayerName(e.currentTarget.value); }} />
       </div>
       {[...(problem ? [problem] : []), ...(toast.value ? [toast.value] : [])].map((m) => <p class="error">{m}</p>)}
       <div class="row">

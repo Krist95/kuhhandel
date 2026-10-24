@@ -5,7 +5,7 @@ import type { MoneyCard } from "../../src/rules/types";
 import { clockOffset } from "./model/clock";
 
 export const view = signal<View | null>(null);
-export const conn = signal<"connecting" | "online" | "offline" | "replaced">("connecting");
+export const conn = signal<"idle" | "connecting" | "online" | "offline" | "replaced">("idle");
 export const notice = signal<string | null>(null);
 export const toast = signal<string | null>(null);
 /** The error code of the most recent server error, so a screen can tell a terminal failure from a retryable one. */
@@ -13,7 +13,7 @@ export const errorCode = signal<ErrorCode | null>(null);
 /** Bumped on every server error, so controls waiting on a reply can re-enable. */
 export const errorSeq = signal(0);
 export const offset = signal(0);
-export const homeScreen = signal<"home" | "create" | { join: string }>("home");
+export const homeScreen = signal<"home" | "create" | "join" | { join: string }>("home");
 export const picked = signal<string[]>([]);
 
 /** Adds the id if absent, removes it if present. */

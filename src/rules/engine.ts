@@ -5,7 +5,7 @@ import { pay } from "./payment";
 import { startGame } from "./setup";
 import { checkHostTransfer, markActive, pause, resume, settleAway, tick } from "./timers";
 import { chooseAction } from "./turn";
-import { closeRoom, createRoom, joinRoom, leaveSeat, removePlayer, requireHost, setConnected } from "./lobby";
+import { closeRoom, createRoom, joinRoom, leaveSeat, removePlayer, requireHost, setConnected, updateSettings } from "./lobby";
 import { LOG_LIMIT, type Action, type Ctx, type Intent, type Outcome, type Player, type Room, type RoomEvent, type Seat } from "./types";
 
 export interface Tx extends Ctx { events: RoomEvent[] }
@@ -64,6 +64,11 @@ function applyIntent(room: Room, p: Player, i: Intent, tx: Tx): Room | null {
         case "removePlayer":
           needLobby(room);
           removePlayer(room, p, i.playerId, tx);
+          return room;
+        case "updateSettings":
+          needLobby(room);
+          requireHost(room, p);
+          updateSettings(room, i, tx);
           return room;
         case "closeRoom":
           requireHost(room, p);

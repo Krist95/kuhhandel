@@ -3,7 +3,7 @@ export const ERROR_TEXT = {
   gameStarted: "This game has already started",
   tooManyAttempts: "Too many failed attempts. Wait a minute and try again.",
   blocked: "You were removed from this room.",
-  badName: "Names must be 1–16 characters.",
+  badName: "Names must be 1–24 characters.",
   nameTaken: "That name is already taken.",
   badRoomName: "Room name must be 1–24 characters.",
   badSeat: "Pick a seat from 1 to 5.",
