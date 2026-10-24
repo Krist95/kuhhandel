@@ -1,5 +1,6 @@
 import { signal } from "@preact/signals";
 import type { ServerMessage, View } from "../../src/protocol";
+import type { MoneyCard } from "../../src/rules/types";
 import { clockOffset } from "./model/clock";
 
 export const view = signal<View | null>(null);
@@ -8,6 +9,18 @@ export const notice = signal<string | null>(null);
 export const toast = signal<string | null>(null);
 export const offset = signal(0);
 export const homeScreen = signal<"home" | "create" | "join">("home");
+export const picked = signal<string[]>([]);
+
+/** Adds the id if absent, removes it if present. */
+export function togglePick(list: readonly string[], id: string): string[] {
+  return list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
+}
+
+/** Keeps only the ids still present in the money list, preserving the list's order. */
+export function validPicks(list: readonly string[], money: readonly MoneyCard[]): string[] {
+  const live = new Set(money.map((m) => m.id));
+  return list.filter((id) => live.has(id));
+}
 
 const CLOSED_COPY = {
   hostClosed: "The host closed the room.",

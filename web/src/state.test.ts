@@ -1,6 +1,7 @@
 import { expect, it } from "vitest";
 import type { View } from "../../src/protocol";
-import { homeScreen, notice, offset, onServerMessage, toast, view } from "./state";
+import type { MoneyCard } from "../../src/rules/types";
+import { homeScreen, notice, offset, onServerMessage, picked, toast, togglePick, validPicks, view } from "./state";
 
 const seated: View = {
   serverTime: 0,
@@ -29,4 +30,15 @@ it("ignores a room closing for a visitor who was not in it", () => {
   homeScreen.value = "create";
   onServerMessage({ type: "roomClosed", reason: "hostClosed" }, 0);
   expect([notice.value, homeScreen.value]).toEqual([null, "create"]);
+});
+it("toggles a note in and out of the picked list, keeping order", () => {
+  expect(togglePick(["a"], "b")).toEqual(["a", "b"]);
+  expect(togglePick(["a", "b"], "a")).toEqual(["b"]);
+});
+it("keeps only ids still in the hand, preserving order", () => {
+  const money: MoneyCard[] = [{ id: "b", value: 10 }, { id: "a", value: 0 }];
+  expect(validPicks(["a", "x", "b"], money)).toEqual(["a", "b"]);
+});
+it("starts with nothing picked", () => {
+  expect(picked.value).toEqual([]);
 });
