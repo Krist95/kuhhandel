@@ -1,0 +1,4 @@
+<!-- @dsCard group="Status" height=120 width=520 subtitle="Server-deadline countdown" -->
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:var(--felt-dark)}</style></head><body><div class="kh kh-bg" style="padding:16px"><div class="kh-row" style="gap:18px"><span class="kh-ring lg" style="--p:1"><span>20</span></span><span class="kh-ring lg" style="--p:0.6"><span>12</span></span><span class="kh-ring lg low" style="--p:0.2"><span>4</span></span><span class="kh-ring " style="--p:0.85"><span>17</span></span><span class="kh-ring low" style="--p:0.15"><span>3</span></span><span class="kh-ring idle" style="--p:0"><span>A</span></span></div></div><script>
+var r=document.querySelector('.kh-ring'),t=20;setInterval(function(){t=t<=0?20:t-1;r.style.setProperty('--p',t/20);r.classList.toggle('low',t<=5);r.firstChild.textContent=t;},1000);
+</script></body></html>

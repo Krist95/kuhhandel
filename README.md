@@ -64,7 +64,8 @@ Try on 3 or more real phones, covering what automated tests can't:
 - A player goes Away after 3 timeouts; "I'm back" clears it.
 - The room closes 5 min after the end screen, and Play again cancels that.
 - At 740×360, check that these fit without scrolling: the lobby's host side column, the Offer and Pay money sheets with a large hand, and the rules and log panels.
-- Opponent panels wrap their animal chips cleanly when a player holds many animals.
+- With many animals, each opponent's herd ledger stays readable (ten columns, gold ring on a set), and tapping a pod or your own animals opens the herd board with every herd side by side.
+- Check the table on the smallest and largest phone in the group
 - Animal frame colours look right, and a complete set gets the gold outline.
 - Reconnect after closing a tab (close handshake) and after switching between Wi-Fi and cellular. The "Reconnecting…" badge appears and then clears.
 - On iPhone, install the PWA before joining a game. The home-screen app has separate storage, so it gets a new token and seat.

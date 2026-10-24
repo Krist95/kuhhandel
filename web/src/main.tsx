@@ -8,9 +8,12 @@ import { alertKey, shouldAlert } from "./model/alerts";
 import { startConnection } from "./net/socket";
 import { view } from "./state";
 import "./styles.css";
+import "./styles/tokens.css";
+import "./styles/table.css";
 
 render(<App />, document.getElementById("app")!);
-startConnection();
+// The dev table scenes (?table) run on fixtures; a live connection would overwrite their view.
+if (!(import.meta.env.DEV && new URLSearchParams(location.search).has("table"))) startConnection();
 
 let prevKey: string | null = null;
 effect(() => {

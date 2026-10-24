@@ -1,3 +1,4 @@
+import { TableScenes } from "./dev/TableScenes";
 import { startConnection } from "./net/socket";
 import { conn, homeScreen, view } from "./state";
 import { ArtPreview } from "./ui/ArtPreview";
@@ -34,6 +35,8 @@ function Screen() {
 export function App() {
   // Dev-only art review page (http://localhost:5173/?art); the DEV check removes it from production builds.
   if (import.meta.env.DEV && new URLSearchParams(location.search).has("art")) return <ArtPreview />;
+  // Dev-only table scenes (http://localhost:5173/?table=<name>), rendered from fixtures with no server.
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has("table")) return <TableScenes />;
   return (
     <>
       <Screen />
