@@ -21,7 +21,12 @@ export function QrScanner(props: { onResult: (roomId: string) => void; onCancel:
       const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(frame.data, frame.width, frame.height);
       const roomId = code ? extractRoomId(code.data) : null;
-      if (roomId) { done = true; props.onResult(roomId); return; }
+      if (roomId) {
+        done = true;
+        stream?.getTracks().forEach((t) => t.stop());
+        props.onResult(roomId);
+        return;
+      }
       raf = requestAnimationFrame(tick);
     };
 
