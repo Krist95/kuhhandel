@@ -28,7 +28,7 @@ function apply(room: Room | null, action: Action, tx: Tx): Room | null {
       if (room) throw new RuleError("roomInUse");
       return createRoom(action, tx);
     case "join":
-      if (!room) throw new RuleError("badCredentials");
+      if (!room) throw new RuleError("roomNotFound");
       if (room.status !== "LOBBY") throw new RuleError("gameStarted");
       joinRoom(room, action, tx);
       return room;

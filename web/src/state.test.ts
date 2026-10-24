@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import type { View } from "../../src/protocol";
 import type { MoneyCard } from "../../src/rules/types";
-import { errorSeq, homeScreen, notice, offset, onServerMessage, picked, toast, togglePick, validPicks, view } from "./state";
+import { errorCode, errorSeq, homeScreen, notice, offset, onServerMessage, picked, toast, togglePick, validPicks, view } from "./state";
 
 const seated: View = {
   serverTime: 0,
@@ -17,6 +17,7 @@ it("stores the view and the clock offset", () => {
 it("turns errors into a toast and closures into a homepage notice", () => {
   onServerMessage({ type: "error", code: "badBid", message: "Bid a multiple of 10 above the top bid." }, 0);
   expect(toast.value).toBe("Bid a multiple of 10 above the top bid.");
+  expect(errorCode.value).toBe("badBid");
   view.value = seated;
   homeScreen.value = { join: "ABC234" };
   onServerMessage({ type: "roomClosed", reason: "inactive" }, 0);

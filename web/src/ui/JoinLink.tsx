@@ -1,11 +1,22 @@
 import { useState } from "preact/hooks";
 import { nameProblem } from "../model/lobby";
 import { sendOrToast } from "../net/socket";
-import { homeScreen, toast } from "../state";
+import { errorCode, homeScreen, toast } from "../state";
+
+const TERMINAL_CODES = new Set(["roomNotFound", "gameStarted", "roomFull"]);
 
 export function JoinLink(props: { roomId: string }) {
   const [playerName, setPlayerName] = useState("");
   const [problem, setProblem] = useState<string | null>(null);
+
+  if (toast.value !== null && errorCode.value !== null && TERMINAL_CODES.has(errorCode.value)) {
+    return (
+      <div class="center">
+        <p class="error">{toast.value}</p>
+        <button onClick={() => { toast.value = null; errorCode.value = null; homeScreen.value = "home"; }}>Back to home</button>
+      </div>
+    );
+  }
 
   const submit = (e: Event) => {
     e.preventDefault();

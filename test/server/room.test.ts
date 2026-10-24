@@ -13,6 +13,11 @@ describe("GameRoom", () => {
   it("answers plain HTTP on /ws with 426", async () => {
     expect((await exports.default.fetch("https://kuhhandel.test/ws")).status).toBe(426);
   });
+  it("serves index.html for a join link instead of 404ing", async () => {
+    const res = await exports.default.fetch("https://kuhhandel.test/join/ABC234");
+    expect(res.status).toBe(200);
+    expect(await res.text()).toContain('<div id="app">');
+  });
   it("gives a visitor an empty view after hello", async () => {
     expect((await connect()).view).toEqual({ serverTime: expect.any(Number), me: null, room: null });
   });
@@ -20,7 +25,20 @@ describe("GameRoom", () => {
     const [anna] = await setupGame(["Anna"]);
     expect(anna!.view.room).toMatchObject({ status: "LOBBY", hostId: anna!.view.me!.id });
     expect(await (await connect()).request(create))
-      .toEqual({ type: "error", code: "roomInUse", message: "A room is already in use. Ask the host for the room ID and password." });
+      .toEqual({ type: "error", code: "roomInUse", message: "A game is already running here. Ask the host for the invite link." });
+  });
+  it("gives roomNotFound when joining with no room created yet", async () => {
+    expect(await (await connect()).request({ type: "joinRoom", roomId: "ZZZZZZ", playerName: "Zed" }))
+      .toMatchObject({ code: "roomNotFound" });
+  });
+  it("gives roomFull when every seat is already taken", async () => {
+    const [anna] = await setupGame(["Anna", "Ben", "Clara", "Dan", "Eve"]);
+    expect(await (await connect()).request({ type: "joinRoom", roomId: anna!.view.room!.roomId, playerName: "Fred" }))
+      .toMatchObject({ code: "roomFull" });
+  });
+  it("rejects createRoom with an invalid decisionSeconds", async () => {
+    expect(await (await connect()).request({ type: "createRoom", roomName: "B", playerName: "Zed", moneyRule: "swap", decisionSeconds: 15 }))
+      .toMatchObject({ code: "invalid" });
   });
   it("gives roomNotFound for an unknown room id, and rate-limits a connection after 5 failures", async () => {
     const [anna] = await setupGame(["Anna"]);

@@ -1,6 +1,5 @@
 export const ERROR_TEXT = {
-  roomInUse: "A room is already in use. Ask the host for the room ID and password.",
-  badCredentials: "Room not found or wrong password.",
+  roomInUse: "A game is already running here. Ask the host for the invite link.",
   gameStarted: "This game has already started",
   tooManyAttempts: "Too many failed attempts. Wait a minute and try again.",
   blocked: "You were removed from this room.",

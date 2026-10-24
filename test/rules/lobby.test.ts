@@ -20,7 +20,7 @@ describe("lobby", () => {
   });
   it("refuses a second room and joining a missing room", () => {
     expect(fail(lobby(), createAction("Zed"))).toBe("roomInUse");
-    expect(fail(null, joinAction("Ben"))).toBe("badCredentials");
+    expect(fail(null, joinAction("Ben"))).toBe("roomNotFound");
   });
   it("rejects duplicate names after trimming, case-insensitively", () => {
     expect(fail(lobby(["Anna", "Ben"]), joinAction("  anna "))).toBe("nameTaken");

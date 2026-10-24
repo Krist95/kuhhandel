@@ -47,7 +47,7 @@ npm run deploy
 ### First-deploy checks
 
 - The deploy output lists the `GAME_ROOM` binding and, on the first deploy, applies the `v1` Durable Object migration.
-- Create and join a room right after deploying. This confirms that PBKDF2 at 100,000 iterations fits the Free plan CPU limit.
+- Create a room, then open the `/join/<id>` link it shares, right after deploying. This confirms the static-assets fallback serves `index.html` for the join route instead of 404ing.
 
 ### Optional auto-deploy
 

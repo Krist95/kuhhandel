@@ -1,4 +1,5 @@
 import { signal } from "@preact/signals";
+import type { ErrorCode } from "../../src/rules/errors";
 import type { ServerMessage, View } from "../../src/protocol";
 import type { MoneyCard } from "../../src/rules/types";
 import { clockOffset } from "./model/clock";
@@ -7,6 +8,8 @@ export const view = signal<View | null>(null);
 export const conn = signal<"connecting" | "online" | "offline" | "replaced">("connecting");
 export const notice = signal<string | null>(null);
 export const toast = signal<string | null>(null);
+/** The error code of the most recent server error, so a screen can tell a terminal failure from a retryable one. */
+export const errorCode = signal<ErrorCode | null>(null);
 /** Bumped on every server error, so controls waiting on a reply can re-enable. */
 export const errorSeq = signal(0);
 export const offset = signal(0);
@@ -38,6 +41,7 @@ export function onServerMessage(msg: ServerMessage, localNow: number): void {
       break;
     case "error":
       toast.value = msg.message;
+      errorCode.value = msg.code;
       errorSeq.value++;
       break;
     case "roomClosed":

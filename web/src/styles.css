@@ -42,6 +42,7 @@ input, select, textarea { font: inherit; padding: 0.3em 0.6em; border-radius: 0.
 .lobby-side { flex: 1; display: flex; flex-direction: column; gap: 0.4em; min-width: 0; }
 .idbox { display: flex; gap: 0.6em; align-items: center; flex-wrap: wrap; }
 .idbox textarea { width: 100%; }
+.qrcode svg { width: 9em; height: 9em; background: #fff; border-radius: 0.3em; }
 .settings { display: flex; flex-direction: column; gap: 0.3em; }
 .settings label { display: flex; justify-content: space-between; align-items: center; gap: 0.5em; }
 .players { list-style: none; margin: 0; padding: 0; max-height: 7em; overflow-y: auto; }
