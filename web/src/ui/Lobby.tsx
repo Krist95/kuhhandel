@@ -4,6 +4,7 @@ import { lobbySeats, shareText } from "../model/lobby";
 import { sendOrToast } from "../net/socket";
 import { homeScreen, toast, view } from "../state";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { QrCode } from "./QrCode";
 
 async function share(room: RoomView, setManual: (t: string) => void): Promise<void> {
   const url = `${location.origin}/join/${room.roomId}`;
@@ -56,6 +57,7 @@ export function Lobby(props: { room: RoomView }) {
           <div class="idbox">
             <div>Room ID <b>{room.roomId}</b></div>
             <button onClick={() => void share(room, setManual)}>Share</button>
+            <QrCode url={`${location.origin}/join/${room.roomId}`} />
             {manual !== null && <textarea readOnly rows={3} value={manual} onFocus={(e) => e.currentTarget.select()} />}
           </div>
         )}
