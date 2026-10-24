@@ -37,9 +37,9 @@ function Screen() {
   // The last view stays on screen while the socket is down, so say that it may be stale.
   const badge = conn.value !== "online" && <div class="conn-badge" role="status">Reconnecting…</div>;
   switch (v.room.status) {
-    case "LOBBY": return <><Lobby room={v.room} />{badge}</>;
+    case "LOBBY": return <><Lobby room={v.room} />{badge}<RotateOverlay /></>;
     case "PLAYING":
-    case "PAUSED": return <><Table room={v.room} />{badge}</>;
+    case "PAUSED": return <><Table room={v.room} />{badge}<RotateOverlay /></>;
     case "FINISHED": return <><EndScreen room={v.room} /><Toast />{badge}</>;
   }
 }
@@ -49,10 +49,5 @@ export function App() {
   if (import.meta.env.DEV && new URLSearchParams(location.search).has("art")) return <ArtPreview />;
   // Dev-only table scenes (http://localhost:5173/?table=<name>), rendered from fixtures with no server.
   if (import.meta.env.DEV && new URLSearchParams(location.search).has("table")) return <TableScenes />;
-  return (
-    <>
-      <Screen />
-      <RotateOverlay />
-    </>
-  );
+  return <Screen />;
 }
