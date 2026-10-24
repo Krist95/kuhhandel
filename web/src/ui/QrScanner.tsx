@@ -32,6 +32,9 @@ export function QrScanner(props: { onResult: (roomId: string) => void; onCancel:
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       .then((s) => {
+        // Cleanup may have already run while the permission prompt was pending (e.g. the component
+        // unmounted, or the user already cancelled) — don't resurrect the camera after that.
+        if (done) { s.getTracks().forEach((t) => t.stop()); return; }
         stream = s;
         if (videoRef.current) { videoRef.current.srcObject = s; void videoRef.current.play(); }
         raf = requestAnimationFrame(tick);

@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { normalizeRoomId } from "../model/lobby";
+import { extractRoomId } from "../model/qrLink";
 import { startConnection } from "../net/socket";
 import { homeScreen, toast } from "../state";
 import { QrScanner } from "./QrScanner";
@@ -12,8 +12,8 @@ export function JoinRoom() {
   const submit = (e: Event) => {
     e.preventDefault();
     toast.value = null;
-    const normalized = normalizeRoomId(roomId);
-    if (normalized.length === 0) { setProblem("Enter a room ID."); return; }
+    const normalized = extractRoomId(roomId);
+    if (normalized === null) { setProblem("Enter a 6-character room ID or paste an invite link."); return; }
     setProblem(null);
     startConnection(normalized);
     homeScreen.value = { join: normalized };
