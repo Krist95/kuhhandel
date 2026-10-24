@@ -49,7 +49,7 @@ export function intro(view: View): { key: string; firstId: string; order: { id: 
   if (!room || !g || room.status !== "PLAYING" || g.deckCount !== 40 || g.phase.kind !== "action") return null;
   const meId = view.me?.id;
   return {
-    key: `${room.roomId}:${g.deadline}`,
+    key: `${room.roomId}:${g.activePlayerId}`,
     firstId: g.activePlayerId,
     order: clockwiseFrom(room.players, g.activePlayerId).map((p) => ({ id: p.id, label: p.id === meId ? "You" : p.name, first: p.id === g.activePlayerId, me: p.id === meId })),
   };

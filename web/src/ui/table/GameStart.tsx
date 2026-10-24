@@ -22,7 +22,7 @@ export function GameStart(props: { view: View; onDone: () => void }) {
   const notes = [...(props.view.me?.money ?? [])].sort((a, b) => a.value - b.value);
   const total = notes.reduce((n, m) => n + m.value, 0);
   return (
-    <div class="kh-veil" onPointerDown={finish}>
+    <div class="kh-veil" onClick={finish}>
       <div class="kh-intro">
         <span class="kh-cap">Shuffled · 40 animals · 4 donkeys somewhere</span>
         <h2>{first?.me ? <><em>You</em> go first.</> : <><em>{first?.label}</em> goes first.</>}</h2>

@@ -70,6 +70,13 @@ describe("intro", () => {
     expect(i.order.filter((o) => o.me)).toHaveLength(1);
     expect(i.order.find((o) => o.me)!.label).toBe("You");
   });
+  it("keys on room and first player, not the deadline (pause/resume keeps it)", () => {
+    const v = view();
+    const i = intro(v)!;
+    expect(i.key).toBe(`${v.room!.roomId}:${i.firstId}`);
+    const resumed = { ...v, room: { ...v.room!, game: { ...v.room!.game!, deadline: (v.room!.game!.deadline ?? 0) + 7000 } } };
+    expect(intro(resumed)!.key).toBe(i.key);
+  });
   it("is null once play starts or when paused", () => {
     expect(intro(buildView(act(game(), "Anna", { type: "chooseAction", action: "auction" }), tok("Clara"), T0))).toBeNull();
     const v = view();
