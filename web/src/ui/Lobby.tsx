@@ -1,17 +1,13 @@
 import { useEffect, useState } from "preact/hooks";
 import type { RoomView } from "../../../src/protocol";
-import { DECISION_SECONDS } from "../../../src/rules/types";
-import { lobbySeats, savedPassword, shareText } from "../model/lobby";
+import { lobbySeats, shareText } from "../model/lobby";
 import { sendOrToast } from "../net/socket";
 import { homeScreen, toast, view } from "../state";
 import { ConfirmDialog } from "./ConfirmDialog";
 
-function password(): string {
-  try { return savedPassword(window.localStorage) ?? ""; } catch { return ""; }
-}
-
 async function share(room: RoomView, setManual: (t: string) => void): Promise<void> {
-  const text = shareText(room.roomId, password(), location.origin);
+  const url = `${location.origin}/join/${room.roomId}`;
+  const text = shareText(room.roomId, url);
   try {
     if (typeof navigator.share === "function") { await navigator.share({ text }); return; }
   } catch (e) {
@@ -59,26 +55,10 @@ export function Lobby(props: { room: RoomView }) {
         {isHost && (
           <div class="idbox">
             <div>Room ID <b>{room.roomId}</b></div>
-            <div>Password <b>{password()}</b></div>
             <button onClick={() => void share(room, setManual)}>Share</button>
             {manual !== null && <textarea readOnly rows={3} value={manual} onFocus={(e) => e.currentTarget.select()} />}
           </div>
         )}
-        <div class="settings">
-          <label>Cow trade money
-            <select disabled={!isHost} value={room.settings.moneyRule}
-              onChange={(e) => sendOrToast({ type: "updateSettings", moneyRule: e.currentTarget.value as "swap" | "loserTakesBoth" })}>
-              <option value="swap">Swap</option>
-              <option value="loserTakesBoth">Loser takes both</option>
-            </select>
-          </label>
-          <label>Time per decision
-            <select disabled={!isHost} value={room.settings.decisionSeconds}
-              onChange={(e) => sendOrToast({ type: "updateSettings", decisionSeconds: Number(e.currentTarget.value) })}>
-              {DECISION_SECONDS.map((s) => <option value={s}>{s} s</option>)}
-            </select>
-          </label>
-        </div>
         <ul class="players">
           {room.players.map((p) => (
             <li>

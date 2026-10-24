@@ -18,7 +18,7 @@ it("turns errors into a toast and closures into a homepage notice", () => {
   onServerMessage({ type: "error", code: "badBid", message: "Bid a multiple of 10 above the top bid." }, 0);
   expect(toast.value).toBe("Bid a multiple of 10 above the top bid.");
   view.value = seated;
-  homeScreen.value = "join";
+  homeScreen.value = { join: "ABC234" };
   onServerMessage({ type: "roomClosed", reason: "inactive" }, 0);
   expect([notice.value, homeScreen.value]).toEqual(["The room closed because nobody was connected for 10 minutes.", "home"]);
   onServerMessage({ type: "removed" }, 0);

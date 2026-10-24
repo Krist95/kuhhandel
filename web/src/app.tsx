@@ -5,6 +5,7 @@ import { ArtPreview } from "./ui/ArtPreview";
 import { EndScreen } from "./ui/EndScreen";
 import { Toast } from "./ui/Toast";
 import { Home } from "./ui/Home";
+import { JoinLink } from "./ui/JoinLink";
 import { Lobby } from "./ui/Lobby";
 import { Table } from "./ui/Table";
 import { RoomForm } from "./ui/RoomForm";
@@ -21,7 +22,12 @@ function Screen() {
     );
   }
   if (v === null) return <div class="center">Connecting…</div>;
-  if (v.room === null) return homeScreen.value === "home" ? <Home /> : <RoomForm mode={homeScreen.value} />;
+  if (v.room === null) {
+    const screen = homeScreen.value;
+    if (screen === "home") return <Home />;
+    if (screen === "create") return <RoomForm />;
+    return <JoinLink roomId={screen.join} />;
+  }
   // The last view stays on screen while the socket is down, so say that it may be stale.
   const badge = conn.value !== "online" && <div class="conn-badge" role="status">Reconnecting…</div>;
   switch (v.room.status) {
