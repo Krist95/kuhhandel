@@ -225,7 +225,10 @@
 /* Hand notes: overlap to fit (Hand sets --ov); the total never gets squeezed out. */
 .kh-hand .notes{display:flex;gap:4px;align-items:flex-end;flex:1;min-width:0}
 .kh-hand .notes>.kh-noteb+.kh-noteb{margin-left:calc(0px - var(--ov,0px))}
-.kh-hand .notes>.kh-noteb[aria-pressed=true]{position:relative;z-index:1}
+.kh-hand .notes>.kh-noteb{position:relative}
+/* Overlapped notes hide their printed number, so label the visible right edge with the value. */
+.kh-notev{display:none}
+.kh-hand .notes.packed .kh-notev{display:block;position:absolute;right:2px;bottom:2px;padding:0 3px;border-radius:3px;background:var(--paper);color:var(--ink);box-shadow:0 0 0 1px var(--ink);font:800 10px/13px var(--font-sans);font-style:normal}
 /* Still too many at 22px visible each: scroll sideways, with room for the lift and ring. */
 .kh-hand .notes.scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:10px 3px 0;margin:-10px -3px 0}
 .kh-hand .notes.scroll::-webkit-scrollbar{display:none}

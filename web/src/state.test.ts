@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import type { View } from "../../src/protocol";
 import type { MoneyCard } from "../../src/rules/types";
-import { homeScreen, notice, offset, onServerMessage, picked, toast, togglePick, validPicks, view } from "./state";
+import { errorSeq, homeScreen, notice, offset, onServerMessage, picked, toast, togglePick, validPicks, view } from "./state";
 
 const seated: View = {
   serverTime: 0,
@@ -41,4 +41,11 @@ it("keeps only ids still in the hand, preserving order", () => {
 });
 it("starts with nothing picked", () => {
   expect(picked.value).toEqual([]);
+});
+
+it("counts server errors so pending controls can re-enable", () => {
+  const before = errorSeq.value;
+  onServerMessage({ type: "error", code: "badBid", message: "Nope." }, 0);
+  onServerMessage({ type: "error", code: "badBid", message: "Nope." }, 0);
+  expect(errorSeq.value).toBe(before + 2);
 });

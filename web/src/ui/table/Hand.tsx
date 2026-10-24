@@ -51,9 +51,10 @@ export function Hand(props: { player: PublicPlayer; money: readonly MoneyCard[];
           : <span class="kh-hint">Your animals land here.</span>}
       </div>
       <div class="money">
-        <div ref={notesRef} class={`notes${fit.scroll ? " scroll" : ""}`} style={{ "--ov": `${fit.overlap}px` } as any}>
-          {notes.map((card) => (
-            <NoteButton key={card.id} card={card} pressed={picked.value.includes(card.id)} disabled={!picking} onToggle={() => { picked.value = togglePick(picked.value, card.id); }} />
+        <div ref={notesRef} class={`notes${fit.overlap > 0 ? " packed" : ""}${fit.scroll ? " scroll" : ""}`} style={{ "--ov": `${fit.overlap}px` } as any}>
+          {/* Earlier notes sit on top, so each overlapped note still shows its right half — where the number is. */}
+          {notes.map((card, i) => (
+            <NoteButton key={card.id} card={card} layer={picked.value.includes(card.id) ? notes.length + 1 : notes.length - i} pressed={picked.value.includes(card.id)} disabled={!picking} onToggle={() => { picked.value = togglePick(picked.value, card.id); }} />
           ))}
         </div>
         {picking ? (

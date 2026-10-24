@@ -6,7 +6,7 @@ import { ANIMAL_NAME, type Animal, type MoneyCard, type TradeTerms } from "../..
 import { bidStep, canSubmitBid, deriveControls, sheetKey, type Controls } from "../../model/controls";
 import { payHint, stepBid, tradeOptions } from "../../model/stage";
 import { sendOrToast } from "../../net/socket";
-import { picked, validPicks, view } from "../../state";
+import { errorSeq, picked, validPicks, view } from "../../state";
 import { AwayBanner } from "../AwayBanner";
 import { AnimalTile } from "./Animals";
 import { BidAmountSheet } from "./BidAmountSheet";
@@ -69,6 +69,9 @@ export function ActionDock(props: { room: RoomView; meId: string }) {
 function DockBody(props: { c: Controls; ctx: Ctx }) {
   const { c } = props;
   const [sent, setSent] = useState(false);
+  // A rejected send leaves the decision open: re-enable the buttons instead of waiting for the timeout.
+  const errors = errorSeq.value;
+  useEffect(() => setSent(false), [errors]);
   const ctx: DCtx = {
     ...props.ctx,
     sent,
