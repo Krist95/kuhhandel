@@ -278,7 +278,7 @@ Every decision uses the same **Time per decision** setting.
 3. **Lobby:** table with 5 seats, room name, room ID + password with share button (host), settings (editable by host, read-only for others), player list with host-only Remove buttons, Leave seat, Start game (host, 3–5 players), Close room (host).
 4. **Game table** (7.3).
 5. **End screen** (5.7).
-6. **Rules & settings screen:** short rules summary plus the active settings; reachable from an info button during the game.
+6. **Rules & settings screen:** short rules summary plus the active settings; reachable from the ⋯ menu during the game.
 
 ### 7.3 Game table (poker-style)
 
@@ -303,9 +303,9 @@ Every player sees **themselves at the bottom**. Opponents sit in one row along t
 - Your money notes, always visible; tap to pick them for payments and offers.
 - Contextual action buttons:
   - Your turn: **Auction**, **Cow trade** (disabled with a reason when not possible).
-  - Bid turn: quick raises **+10 / +50 / +100**, a field for any amount (multiples of 10), **Bid**, **Pass**.
+  - Bid turn: a −/+ stepper (steps of 10), quick raises **+10 / +50 / +100**, and a long-press on the amount for a number sheet (any multiple of 10); **Bid**, **Pass**.
   - Auctioneer: **Sell**, **Buy it** (disabled when unaffordable).
-  - Cow trade setup: pick player → animal → 1 or 2 (only when allowed) → cards → **Offer**.
+  - Cow trade setup: one list of (player, animal) rows, each with a ×1/×2 toggle (×2 only when allowed) → pick notes in your hand → **Offer**.
   - Defender: pick cards → **Counter**, or **Put nothing**.
   - Payment: pick cards (running total vs amount owed) → **Pay**.
 
